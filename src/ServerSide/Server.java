@@ -15,12 +15,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class Server implements Runnable
 {
-//    public static void main(String[] args)
-//    {
-//        new Server();
-//    }
 
     // DATA MEMBERS
+
+    //lazy instantiation of singleton class
+    private static Server singletonRef = new Server();
 
     //the port this ServerManager is on
     private final int serverPort = 7777;
@@ -31,18 +30,20 @@ public class Server implements Runnable
     //a blocking queue for messages to be processed
     private ArrayBlockingQueue<Message> msgQueue = new ArrayBlockingQueue<>(1000);
 
-//    //a map which holds the currently existing chat rooms
-//    private HashMap<String, ChatRoomServer> chatRoomMap = new HashMap<>();
 
     // METHODS
 
-    Server()
+    private Server()
     {
         System.out.println("Server turned on\n");
 
         new Thread(this).start();
     }
 
+    static Server getInstance()
+    {
+        return singletonRef;
+    }
 
     @Override
     public void run()
