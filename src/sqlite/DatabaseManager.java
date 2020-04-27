@@ -17,7 +17,11 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\TicTacToeJava\\Database\\TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:Database/TicTacToeDB.db");
+            // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\TicTacToeJava\Database\TicTacToeDB.db
+            // Phill: Database/TicTacToeDB.db
+            // Kenny:
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -37,8 +41,6 @@ public class DatabaseManager implements DataSource {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    // Class.forName("org.sqlite.JDBC");
-                        //instance = DriverManager.getConnection("jdbc:sqlite:Database\\TicTacToeDB.db");
                         System.out.println("Database Connection SUCCESSFUL\n");
 
                     return instance;
@@ -187,7 +189,7 @@ public class DatabaseManager implements DataSource {
 
         if(obj instanceof User) {
 
-            String query = "SELECT userName "
+            String query = "SELECT * "
                         +  "FROM User "
                         +  "WHERE userID > 1 "
                         +  "AND  status != 'INACTIVE' ";
@@ -197,7 +199,7 @@ public class DatabaseManager implements DataSource {
 
                 while(rs.next())
                 {
-//                    User u = new User(rs.getString("userName"));
+//                    User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"), rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
 //                    list.add(u);
                 }
 
@@ -212,7 +214,10 @@ public class DatabaseManager implements DataSource {
         {
 
         }
+        else if (obj instanceof  Moves)
+        {
 
+        }
         return list;
     }
 
@@ -254,7 +259,7 @@ public class DatabaseManager implements DataSource {
 
             qryBuilder.append("* " +
                               "FROM Game " +
-                              "WHERE starterID = \'" + filter + "\'");
+                              + filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());

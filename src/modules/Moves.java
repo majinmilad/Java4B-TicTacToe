@@ -11,17 +11,19 @@ public class Moves  extends BaseModel{
     private int playerId;
     private int Xcoord;
     private int Ycoord;
+    private String time;
 
+
+    public void  setTIme()
+    {
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        time  = dateFormat.format(date);
+    }
 
     public String getTime()
     {
-        String strDate;
-
-        Date time = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        strDate = dateFormat.format(time);
-
-        return strDate;
+        return time;
     }
 
     public void setYcoord(int ycoord) {
