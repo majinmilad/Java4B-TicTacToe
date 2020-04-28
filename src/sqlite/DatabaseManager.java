@@ -340,9 +340,9 @@ public class DatabaseManager implements DataSource {
                 while(rs.next())
                 {
                     Game game = new Game((rs.getString("gameId")), rs.getString("startTime"),
-                                         rs.getString("endTime"), Integer.parseInt(rs.getString("p1Id")),
-                                        Integer.parseInt(rs.getString("p2Id")),
-                                        Integer.parseInt(rs.getString("starterId")),Integer.parseInt(rs.getString("winnerId")));
+                                         rs.getString("endTime"), (rs.getString("p1Id")),
+                                        (rs.getString("p2Id")), (rs.getString("starterId")),
+                                        (rs.getString("winnerId")));
                     list.add(game);
                 }
 
