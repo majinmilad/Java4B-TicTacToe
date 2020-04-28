@@ -15,11 +15,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import modules.User;
-import sqlite.DatabaseManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class loginWindowController {
 
@@ -56,14 +53,14 @@ public class loginWindowController {
                 Global.CurrentAccount.update(user);
 
                 //proceed to the menu window
-                Parent menuWindow = FXMLLoader.load(getClass().getResource("menuWindow.fxml"));
-                Scene menuScene = new Scene(menuWindow);
-                Stage menuWindowStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                menuWindowStage.setScene(menuScene);
-                menuWindowStage.show();
+                Parent mainMenuWindow = FXMLLoader.load(getClass().getResource("mainMenuWindow.fxml"));
+                Scene mainMenuScene = new Scene(mainMenuWindow);
+                Stage mainMenuWindowStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                mainMenuWindowStage.setScene(mainMenuScene);
+                mainMenuWindowStage.show();
 
                 //set logout upon exiting the menu window
-                menuWindowStage.setOnCloseRequest(anonymF ->
+                mainMenuWindowStage.setOnCloseRequest(anonymF ->
                 {
                     try {
                         Global.toServer.writeObject(new LogoutMsg(Global.CurrentAccount.getCurrentUser()));
@@ -89,7 +86,7 @@ public class loginWindowController {
 
     @FXML
     void backButtonClicked(ActionEvent event) throws IOException {
-        Parent mainWindow = FXMLLoader.load(getClass().getResource("mainWindow.fxml"));
+        Parent mainWindow = FXMLLoader.load(getClass().getResource("primaryWindow.fxml"));
         Scene mainScene = new Scene(mainWindow);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(mainScene);

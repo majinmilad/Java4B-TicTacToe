@@ -312,4 +312,10 @@ public class Server extends Observable implements Runnable
         setChanged();
         notifyObservers(obj);
     }
+
+
+    void processMessage(Message msg)
+    {
+        msgQueue.add(msg);
+    }
 }

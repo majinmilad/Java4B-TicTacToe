@@ -12,12 +12,12 @@ import java.sql.SQLException;
 
 public class Main extends Application {
 
-    // ../app/addUserWindow.fxml
-    // ../app/mainWindow.fxml
-    // ../app/loginWindow.fxml
-    // ../app/menuWindow.fxml
-    // ../app/deleteWindow.fxml
-    // ../app/updateWindow.fxml
+    // ../app/primaryWindow.fxml
+        // ../app/createAccountWindow.fxml
+        // ../app/loginWindow.fxml
+            // ../app/mainMenuWindow.fxml
+                // ../app/accountSettingsWindow.fxml
+                    // ../app/updateUserWindow.fxml
 
     @Override
     public void start(Stage primaryStage) throws Exception
@@ -32,7 +32,7 @@ public class Main extends Application {
         else
             System.out.println("Connection to Server failed...\n");
 
-        Parent root = FXMLLoader.load(getClass().getResource("../app/mainWindow.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("primaryWindow.fxml"));
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
