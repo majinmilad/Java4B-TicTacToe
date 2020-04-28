@@ -222,7 +222,11 @@ public class DatabaseManager implements DataSource {
         }
         else if (obj instanceof Game)
         {
+            Game game = (Game) obj;
 
+            qryBuilder.append("FROM Game "
+                            +  "WHERE playerId = \'" + game.get
+                            +  "AND  status != 'INACTIVE' ");
         }
         else if (obj instanceof Moves)
         {
