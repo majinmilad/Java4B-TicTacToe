@@ -196,7 +196,12 @@ public class DatabaseManager implements DataSource {
         if(obj instanceof User)
         {
 
-            qryBuilder.append("FROM User "
+
+//            qryBuilder.append("FROM User "
+
+//            String query = "SELECT * "
+//                        +  "FROM User "
+
                         +  "WHERE userID > 1 "
                         +  "AND  status != 'INACTIVE' ");
 
@@ -205,8 +210,13 @@ public class DatabaseManager implements DataSource {
 
                 while(rs.next())
                 {
+
 //                    User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"), rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
 //                    list.add(u);
+
+//                    User u = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"), rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
+//                    list.add(u);
+
                 }
 
                 System.out.println("Got all QUERY \n\n");
