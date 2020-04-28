@@ -17,7 +17,11 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\TicTacToeJava\\Database\\TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:Database/TicTacToeDB.db");
+            // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\Java4B-TicTacToe\Database\TicTacToeDB.db
+            // Phill: Database/TicTacToeDB.db
+            // Kenny:
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -37,8 +41,6 @@ public class DatabaseManager implements DataSource {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    // Class.forName("org.sqlite.JDBC");
-                        //instance = DriverManager.getConnection("jdbc:sqlite:Database\\TicTacToeDB.db");
                         System.out.println("Database Connection SUCCESSFUL\n");
 
                     return instance;
@@ -76,8 +78,8 @@ public class DatabaseManager implements DataSource {
         {
             Moves m = (Moves) obj;
 
-            qryBuilder.append("Moves (id,gameId,playerId,X_coord,Y_coord,time) " +
-                              "VALUES (" + m.getId() + ", " + m.getGameId() +  ", " + m.getPlayerId() + ", " + m.getXcoord()
+            qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time) " +
+                              "VALUES ( " + m.getGameId() +  ", " + m.getId() + ", " + m.getXcoord()
                                          + ", " + m.getYcoord() + ", \'" + m.getTime() + "\')" );
         }
         else if(obj instanceof GameViewers)
@@ -85,7 +87,7 @@ public class DatabaseManager implements DataSource {
             GameViewers gv = (GameViewers) obj;
 
             qryBuilder.append("GameViewers (gameId,viewerId) " +
-                              "VALUES (" + gv.getGameId() + ", " + gv.getId() + ')');
+                              "VALUES (" + gv.getId() + ", " + gv.getPlayerId() + ')');
         }
 
         try {
@@ -154,10 +156,11 @@ public class DatabaseManager implements DataSource {
         }
     }
 
-    @Override
-    public BaseModel get(int id) {
-        return null;
-    }
+//    @Override
+//    public BaseModel get(String id, BaseModel obj)
+//    {
+//        return null;
+//    }
 
     @Override
     public BaseModel authenticate(String username, String password) {
@@ -185,20 +188,27 @@ public class DatabaseManager implements DataSource {
     public List <BaseModel> list(BaseModel obj) {
         List <BaseModel> list = new ArrayList<>();
 
-        if(obj instanceof User) {
+        StringBuilder qryBuilder = new StringBuilder();
+        qryBuilder.append("SELECT * ");
 
-            String query = "SELECT * "
-                        +  "FROM User "
+        if(obj instanceof User)
+        {
+
+
+            qryBuilder.append("FROM User "
                         +  "WHERE userID > 1 "
-                        +  "AND  status != 'INACTIVE' ";
+                        +  "AND  status != 'INACTIVE' ");
 
             try {
-                ResultSet rs = executeQuery(query);
+                    ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
-                    User u = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"), rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
-                    list.add(u);
+
+                    User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"),
+                                         rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
+                    list.add(user);
+
                 }
 
                 System.out.println("Got all QUERY \n\n");
@@ -208,8 +218,54 @@ public class DatabaseManager implements DataSource {
                 e.printStackTrace();
             }
         }
-        else if (obj instanceof Game)
+//        else if (obj instanceof Game)
+//        {
+//            Game game = (Game) obj;
+//
+//            qryBuilder.append("FROM Game "
+//                            +  "WHERE playerId = \'" + game.get() + "\' "
+//                            +  "AND  status != 'INACTIVE' ");
+//        }
+        else if (obj instanceof Moves)
         {
+            Moves moves = (Moves) obj;
+            qryBuilder.append("FROM Moves "
+                            +  "WHERE gameId = \'" + moves.getGameId() + "\' "
+                            +  "ORDER BY time ASC;");
+
+            try {
+                    ResultSet   rs = executeQuery(qryBuilder.toString());
+                    while(rs.next())
+                    {
+                        Moves m = new Moves(rs.getString("gameId"), rs.getString("playerId"), Integer.parseInt(rs.getString("X_coord")),
+                                             Integer.parseInt(rs.getString("Y_coord")), rs.getString("time"));
+                        list.add(m);
+                    }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Got All Moves Queries");
+        }
+        else if (obj instanceof GameViewers)
+        {
+            qryBuilder.append("FROM GameViewers ");
+
+            try {
+                    ResultSet rs = executeQuery(qryBuilder.toString());
+
+                    while(rs.next())
+                    {
+                        GameViewers gv = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
+                        list.add(gv);
+                    }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Able to get all GameViewers!!\n\n");
 
         }
 
@@ -250,18 +306,17 @@ public class DatabaseManager implements DataSource {
         }
         else if (obj instanceof Game)
         {
-            Game g = (Game) obj;
 
             qryBuilder.append("* " +
                               "FROM Game " +
-                              "WHERE starterID = \'" + filter + "\'");
+                               filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
-                    Game game = new Game(Integer.parseInt(rs.getString("id")), rs.getString("startTime"),
+                    Game game = new Game((rs.getString("gameId")), rs.getString("startTime"),
                                          rs.getString("endTime"), Integer.parseInt(rs.getString("p1Id")),
                                         Integer.parseInt(rs.getString("p2Id")),
                                         Integer.parseInt(rs.getString("starterId")),Integer.parseInt(rs.getString("winnerId")));
