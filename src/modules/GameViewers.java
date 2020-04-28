@@ -4,19 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameViewers extends BaseModel {
-    private int gameId;
-    private List<User> viewers = new ArrayList<>();
+    private String playerId;
 
-    GameViewers(List<User> viewers)
-    {
-        this.viewers = List.copyOf(viewers);
+    public String getPlayerId() {
+        return playerId;
     }
 
-    public int getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
+    public void setPlayerId(String gameId) {
+        this.playerId = gameId;
     }
 }

@@ -229,10 +229,9 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof Moves)
         {
             Moves moves = (Moves) obj;
-            qryBuilder.append("* "
-                    +  "FROM Moves "
-                    +  "WHERE gameId = \'" + moves.getGameId() + "\' "
-                    +  "ORDER BY time ASC;");
+            qryBuilder.append("FROM Moves "
+                            +  "WHERE gameId = \'" + moves.getGameId() + "\' "
+                            +  "ORDER BY time ASC;");
 
             try {
                     ResultSet   rs = executeQuery(qryBuilder.toString());
@@ -249,6 +248,25 @@ public class DatabaseManager implements DataSource {
 
             System.out.println("Got All Moves Queries");
         }
+        else if (obj instanceof GameViewers)
+        {
+            qryBuilder.append("FROM GameViewers ");
+
+            try {
+                    ResultSet rs = executeQuery(qryBuilder.toString());
+
+                    while(rs.next())
+                    {
+                        GameViewers gv = new GameViewers();
+                        gv.setId(rs.getString());
+                    }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
         return list;
     }
 
@@ -296,7 +314,7 @@ public class DatabaseManager implements DataSource {
 
                 while(rs.next())
                 {
-                    Game game = new Game(Integer.parseInt(rs.getString("id")), rs.getString("startTime"),
+                    Game game = new Game((rs.getString("gameId")), rs.getString("startTime"),
                                          rs.getString("endTime"), Integer.parseInt(rs.getString("p1Id")),
                                         Integer.parseInt(rs.getString("p2Id")),
                                         Integer.parseInt(rs.getString("starterId")),Integer.parseInt(rs.getString("winnerId")));
