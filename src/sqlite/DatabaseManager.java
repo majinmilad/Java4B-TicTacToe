@@ -157,7 +157,10 @@ public class DatabaseManager implements DataSource {
     }
 
     @Override
-    public BaseModel get(int id) {
+    public BaseModel get(String id, BaseModel obj)
+    {
+
+
         return null;
     }
 
@@ -187,15 +190,18 @@ public class DatabaseManager implements DataSource {
     public List <BaseModel> list(BaseModel obj) {
         List <BaseModel> list = new ArrayList<>();
 
-        if(obj instanceof User) {
+        StringBuilder qryBuilder = new StringBuilder();
+        qryBuilder.append("SELECT * ");
 
-            String query = "SELECT * "
-                        +  "FROM User "
+        if(obj instanceof User)
+        {
+
+            qryBuilder.append("FROM User "
                         +  "WHERE userID > 1 "
-                        +  "AND  status != 'INACTIVE' ";
+                        +  "AND  status != 'INACTIVE' ");
 
             try {
-                ResultSet rs = executeQuery(query);
+                ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
@@ -217,6 +223,18 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof  Moves)
         {
 
+            if(obj instanceof Moves)
+            {
+                qryBuilder.append("* "
+                        +  "FROM Moves "
+                        +  "WHERE playerId = \'" + id + "\' ");
+            }
+
+            ResultSet rs = executeQuery(qryBuilder.toString())
+            while(rs.next())
+            {
+                Moves m = new Moves()
+            }
         }
         return list;
     }

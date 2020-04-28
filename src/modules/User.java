@@ -30,6 +30,7 @@ public class User extends BaseModel
         setStatus("OFFLINE");
         setCreated();
         userUUID = UUID.randomUUID().toString();
+        setId(userUUID);
     }
 
     public User(String username, String password, String firstName, String lastName, String status, String id, String created)

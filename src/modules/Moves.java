@@ -6,12 +6,20 @@ import java.util.Date;
 import java.util.logging.SimpleFormatter;
 
 public class Moves  extends BaseModel{
-//    private int moveId;
-    private int gameId;
-    private int playerId;
+    private String gameId;
     private int Xcoord;
     private int Ycoord;
     private String time;
+
+
+    Moves(String gameId, String playerId, int X, int Y, String time)
+    {
+        setId(playerId);
+        setGameId(gameId)
+        setXcoord(X);
+        setYcoord(Y);
+        setTIme(time);
+    }
 
 
     public void  setTIme()
@@ -34,13 +42,7 @@ public class Moves  extends BaseModel{
         Xcoord = xcoord;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
-    }
-
-    public int getPlayerId() {
-        return playerId;
-    }
+    public void setGameId(String id) {this.gameId = id;}
 
     public int getXcoord() {
         return Xcoord;
@@ -50,7 +52,7 @@ public class Moves  extends BaseModel{
         return Ycoord;
     }
 
-    public int getGameId() {
+    public String getGameId() {
         return gameId;
     }
 }
