@@ -22,7 +22,7 @@ public class Game extends BaseModel {
 
     }
 
-    public Game(int gameId, String sTime, String eTime, int p1, int p2, int starter, int winner)
+    public Game(String gameId, String sTime, String eTime, int p1, int p2, int starter, int winner)
     {
         setId(gameId);
         recallTimes(sTime,eTime);
