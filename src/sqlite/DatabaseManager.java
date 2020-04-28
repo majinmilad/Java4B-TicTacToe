@@ -156,13 +156,11 @@ public class DatabaseManager implements DataSource {
         }
     }
 
-    @Override
-    public BaseModel get(String id, BaseModel obj)
-    {
-
-
-        return null;
-    }
+//    @Override
+//    public BaseModel get(String id, BaseModel obj)
+//    {
+//        return null;
+//    }
 
     @Override
     public BaseModel authenticate(String username, String password) {
@@ -288,7 +286,6 @@ public class DatabaseManager implements DataSource {
         }
         else if (obj instanceof Game)
         {
-            Game g = (Game) obj;
 
             qryBuilder.append("* " +
                               "FROM Game " +
