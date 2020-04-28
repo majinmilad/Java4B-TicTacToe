@@ -10,10 +10,11 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Observable;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class Server implements Runnable
+public class Server extends Observable implements Runnable
 {
 
     // DATA MEMBERS
@@ -89,8 +90,8 @@ public class Server implements Runnable
         private Thread clientThread;
 
         //this connection's socket streams
-        private ObjectInputStream objectInputFromClientManager;
-        private ObjectOutputStream objectOutputToClientManager;
+        private ObjectInputStream objectInputFromClient;
+        private ObjectOutputStream objectOutputToClient;
 
         //METHODS
         ClientConnection(Socket socket, UUID id)
@@ -113,7 +114,7 @@ public class Server implements Runnable
                 //receive incoming messages
                 while(true)
                 {
-                    Message incomingMsg = (Message) objectInputFromClientManager.readObject();
+                    Message incomingMsg = (Message) objectInputFromClient.readObject();
                     incomingMsg.setConnectionID(connectionID);
                     msgQueue.add(incomingMsg);
                 }
@@ -131,7 +132,7 @@ public class Server implements Runnable
         {
             try
             {
-                objectOutputToClientManager.writeObject(msg);
+                objectOutputToClient.writeObject(msg);
             }
             catch (IOException e) {
                 //System.out.println("exception caught in sendMessageFromPub() of " + memberName + "'s MemberConnection object");
@@ -142,8 +143,8 @@ public class Server implements Runnable
         private void wrapSocketStreams()
         {
             try {
-                objectOutputToClientManager = new ObjectOutputStream(socket.getOutputStream());
-                objectInputFromClientManager = new ObjectInputStream(socket.getInputStream());
+                objectOutputToClient = new ObjectOutputStream(socket.getOutputStream());
+                objectInputFromClient = new ObjectInputStream(socket.getInputStream());
             } catch (IOException e) {
                 System.out.println("exception caught in wrapSocketStream()\n\n");
                 e.printStackTrace();
@@ -178,28 +179,30 @@ public class Server implements Runnable
 
                         if(returnedUser == null) //account does not exist
                         {
-                            client.objectOutputToClientManager.writeBoolean(false); //notify account doesnt exist
+                            client.objectOutputToClient.writeBoolean(false); //notify account doesnt exist
 
                             Object successfulInsert = DatabaseManager.getInstance().insert(regMsg.getUser());
 
-                            if(successfulInsert != null)
-                                client.objectOutputToClientManager.writeBoolean(true);
+                            if(successfulInsert != null) {
+                                client.objectOutputToClient.writeBoolean(true);
+                                sendToServerGUI(regMsg); //send to server GUI
+                            }
                             else
-                                client.objectOutputToClientManager.writeBoolean(false);
+                                client.objectOutputToClient.writeBoolean(false);
 
-                            client.objectOutputToClientManager.flush();
+                            client.objectOutputToClient.flush();
                         }
                         else //account already exists
                         {
-                            client.objectOutputToClientManager.writeBoolean(true); //notify account exists
+                            client.objectOutputToClient.writeBoolean(true); //notify account exists
 
                             //notify of INACTIVE status
                             if(returnedUser.getStatus().equals("INACTIVE"))
-                                client.objectOutputToClientManager.writeBoolean(true);
+                                client.objectOutputToClient.writeBoolean(true);
                             else
-                                client.objectOutputToClientManager.writeBoolean(false);
+                                client.objectOutputToClient.writeBoolean(false);
 
-                            client.objectOutputToClientManager.flush();
+                            client.objectOutputToClient.flush();
                         }
                     }
                     else if(nextMsg instanceof LoginMsg)
@@ -211,29 +214,32 @@ public class Server implements Runnable
                         if(returnedUser != null)
                         {
                             //notify authentication status
-                            client.objectOutputToClientManager.writeBoolean(true);
+                            client.objectOutputToClient.writeBoolean(true);
 
                             if(returnedUser.getStatus().equals("ONLINE"))
                             {
                                 //notify that user's already online
-                                client.objectOutputToClientManager.writeBoolean(true);
+                                client.objectOutputToClient.writeBoolean(true);
                             }
                             else
                             {
                                 //notify user is not already online
-                                client.objectOutputToClientManager.writeBoolean(false);
+                                client.objectOutputToClient.writeBoolean(false);
 
-                                //send the user info
+                                //set user to ONLINE status and send the user info
                                 User user = (User) DatabaseManager.getInstance().getUser(loginMsg.getUsername());
                                 user.setStatus("ONLINE");
                                 DatabaseManager.getInstance().update(user);
-                                client.objectOutputToClientManager.writeObject(user);
+                                client.objectOutputToClient.writeObject(user);
+
+                                //send message to server GUI
+                                sendToServerGUI(loginMsg);
                             }
                         }
                         else
-                            client.objectOutputToClientManager.writeBoolean(false); //not authenticated
+                            client.objectOutputToClient.writeBoolean(false); //not authenticated
 
-                        client.objectOutputToClientManager.flush();
+                        client.objectOutputToClient.flush();
                     }
                     else if(nextMsg instanceof DeleteUserMsg)
                     {
@@ -242,9 +248,7 @@ public class Server implements Runnable
                         Object returnStatus = DatabaseManager.getInstance().delete(deleteMsg.getUser());
 
                         if(returnStatus != null)
-                        {
-                            System.out.println(deleteMsg.getUser().getUsername() + " account soft deleted\n");
-                        }
+                            sendToServerGUI(deleteMsg);
                     }
                     else if(nextMsg instanceof LogoutMsg)
                     {
@@ -253,9 +257,7 @@ public class Server implements Runnable
                         Object returnStatus = DatabaseManager.getInstance().update(logoutMsg.getUser());
 
                         if(returnStatus != null)
-                        {
-                            System.out.println(logoutMsg.getUser().getUsername() + " logged out\n");
-                        }
+                            sendToServerGUI(logoutMsg);
                     }
                     else if(nextMsg instanceof ReactivateUserMsg)
                     {
@@ -272,6 +274,9 @@ public class Server implements Runnable
                                 returnedUser.setLastName(reactivateMsg.getUser().getLastName());
                                 returnedUser.setPassword(reactivateMsg.getUser().getPassword());
                                 DatabaseManager.getInstance().update(returnedUser);
+
+                                //send to server GUI
+                                sendToServerGUI(reactivateMsg);
                             }
                         }
                         else //account didn't exist
@@ -284,10 +289,13 @@ public class Server implements Runnable
                         UpdateUserMsg updateUserMsg = (UpdateUserMsg) nextMsg;
                         Object returnedUser = DatabaseManager.getInstance().update(updateUserMsg.getUser());
                         if(returnedUser != null)
-                            client.objectOutputToClientManager.writeBoolean(true);
+                        {
+                            client.objectOutputToClient.writeBoolean(true);
+                            sendToServerGUI(updateUserMsg);
+                        }
                         else
-                            client.objectOutputToClientManager.writeBoolean(false);
-                        client.objectOutputToClientManager.flush();
+                            client.objectOutputToClient.writeBoolean(false);
+                        client.objectOutputToClient.flush();
                     }
                 }
                 catch (InterruptedException | IOException e) {
@@ -296,5 +304,12 @@ public class Server implements Runnable
                 }
             }
         }
+    }
+
+
+    void sendToServerGUI(Object obj)
+    {
+        setChanged();
+        notifyObservers(obj);
     }
 }

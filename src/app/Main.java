@@ -22,7 +22,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        //establish connection to ServerManager
+        //establish connection to the Server
         Socket socket = new Socket("localhost", 7777);
 
         if(socket.isConnected()) {
