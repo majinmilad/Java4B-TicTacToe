@@ -250,15 +250,18 @@ public class DatabaseManager implements DataSource {
         }
         else if (obj instanceof GameViewers)
         {
-            qryBuilder.append("FROM GameViewers ");
+            GameViewers gv = (GameViewers) obj;
+
+            qryBuilder.append("FROM GameViewers " +
+                              "WHERE viewerId = \'" + gv.getId() + "\' " );
 
             try {
                     ResultSet rs = executeQuery(qryBuilder.toString());
 
                     while(rs.next())
                     {
-                        GameViewers gv = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
-                        list.add(gv);
+                        GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
+                        list.add(gameViewers);
                     }
 
             } catch (SQLException e) {
@@ -310,6 +313,26 @@ public class DatabaseManager implements DataSource {
             qryBuilder.append("* " +
                               "FROM Game " +
                                filter);
+
+            /*
+                    @ To get a plyer's game history
+                    "WHERE p1Id = \'" +  playerID  + "\' "
+                   + OR p2Id = \'" +  playerID + "\' "
+
+                    @ To Get Active Games
+                    "WHERE endTime != NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To Get Completed Games
+                    "WHERE endTime = NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To See if Player is playing
+                     "WHERE p1Id = \'" +  playerID  + "\' "
+                   + "OR p2Id = \'" +  playerID + "\' "
+                   + "AND endTime != NULL "
+
+             */
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
