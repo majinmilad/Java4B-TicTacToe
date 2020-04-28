@@ -12,7 +12,7 @@ public class ServerMain extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        Server server = new Server();
+        Server server = Server.getInstance();
 
         Parent root = FXMLLoader.load(getClass().getResource("../ServerSide/serverMainWindow.fxml"));
         primaryStage.setScene(new Scene(root));
