@@ -202,14 +202,14 @@ public class DatabaseManager implements DataSource {
                         +  "AND  status != 'INACTIVE' ");
 
             try {
-                ResultSet rs = executeQuery(qryBuilder.toString());
+                    ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
 
-//                    User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"),
-//                                         rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
-//                    list.add(u);
+                    User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"),
+                                         rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
+                    list.add(user);
 
                 }
 
@@ -220,14 +220,14 @@ public class DatabaseManager implements DataSource {
                 e.printStackTrace();
             }
         }
-        else if (obj instanceof Game)
-        {
-            Game game = (Game) obj;
-
-            qryBuilder.append("FROM Game "
-                            +  "WHERE playerId = \'" + game.get
-                            +  "AND  status != 'INACTIVE' ");
-        }
+//        else if (obj instanceof Game)
+//        {
+//            Game game = (Game) obj;
+//
+//            qryBuilder.append("FROM Game "
+//                            +  "WHERE playerId = \'" + game.get() + "\' "
+//                            +  "AND  status != 'INACTIVE' ");
+//        }
         else if (obj instanceof Moves)
         {
             Moves moves = (Moves) obj;
