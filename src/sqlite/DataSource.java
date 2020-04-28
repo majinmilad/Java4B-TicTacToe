@@ -7,7 +7,7 @@ public interface DataSource {
     BaseModel insert(BaseModel obj);
     BaseModel delete(BaseModel obj);
     BaseModel update(BaseModel obj);
-    BaseModel get(int id);
+    BaseModel get(String id, BaseModel obj);
     BaseModel authenticate(String username, String password);
     BaseModel getUser(String userName);
 

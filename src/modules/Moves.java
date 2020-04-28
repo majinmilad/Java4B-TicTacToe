@@ -11,18 +11,22 @@ public class Moves  extends BaseModel{
     private int Ycoord;
     private String time;
 
+    Moves()
+    {
 
-    Moves(String gameId, String playerId, int X, int Y, String time)
+    }
+
+    public Moves(String gameId, String playerId, int X, int Y, String time)
     {
         setId(playerId);
-        setGameId(gameId)
+        setGameId(gameId);
         setXcoord(X);
         setYcoord(Y);
-        setTIme(time);
+        setRetrievedTime(time);
     }
 
 
-    public void  setTIme()
+    public void setInitialTime()
     {
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -32,6 +36,11 @@ public class Moves  extends BaseModel{
     public String getTime()
     {
         return time;
+    }
+
+    public void setRetrievedTime(String time)
+    {
+        this.time = time;
     }
 
     public void setYcoord(int ycoord) {
