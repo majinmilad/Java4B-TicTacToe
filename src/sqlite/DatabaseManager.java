@@ -87,7 +87,7 @@ public class DatabaseManager implements DataSource {
             GameViewers gv = (GameViewers) obj;
 
             qryBuilder.append("GameViewers (gameId,viewerId) " +
-                              "VALUES (" + gv.getGameId() + ", " + gv.getId() + ')');
+                              "VALUES (" + gv.getId() + ", " + gv.getPlayerId() + ')');
         }
 
         try {
@@ -257,13 +257,15 @@ public class DatabaseManager implements DataSource {
 
                     while(rs.next())
                     {
-                        GameViewers gv = new GameViewers();
-                        gv.setId(rs.getString());
+                        GameViewers gv = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
+                        list.add(gv);
                     }
 
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+
+            System.out.println("Able to get all GameViewers!!\n\n");
 
         }
 
