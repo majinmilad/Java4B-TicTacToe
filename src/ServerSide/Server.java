@@ -122,7 +122,11 @@ public class Server extends Observable implements Runnable
             catch (IOException | ClassNotFoundException e)
             {
                 if(e instanceof IOException)
+                {
                     clientMap.remove(connectionID);
+//                    LogoutMsg logoutMsg = new LogoutMsg();
+//                    processMessage(logoutMsg);
+                }
                 System.out.println("exception caught in one of server's ClientConnection object's run()");
                 e.printStackTrace();
             }
