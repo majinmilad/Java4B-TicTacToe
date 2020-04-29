@@ -121,11 +121,16 @@ public class Server extends Observable implements Runnable
             }
             catch (IOException | ClassNotFoundException e)
             {
-                if(e instanceof IOException)
+                if(e instanceof IOException) //client program disconnected
                 {
+                    //logoff the client
+                    User returnedUser = (User) DatabaseManager.getInstance().getUser(clientsUserName);
+                    returnedUser.setStatus("OFFLINE");
+                    DatabaseManager.getInstance().update(returnedUser);
+                    //send to server GUI
+                    sendToServerGUI(new LogoutMsg(returnedUser));
+                    //remove their connection from map
                     clientMap.remove(connectionID);
-//                    LogoutMsg logoutMsg = new LogoutMsg();
-//                    processMessage(logoutMsg);
                 }
                 System.out.println("exception caught in one of server's ClientConnection object's run()");
                 e.printStackTrace();
@@ -189,6 +194,7 @@ public class Server extends Observable implements Runnable
 
                             if(successfulInsert != null) {
                                 client.objectOutputToClient.writeBoolean(true);
+                                client.clientsUserName = regMsg.getUser().getUsername(); //update ClientConnection username attribute
                                 sendToServerGUI(regMsg); //send to server GUI
                             }
                             else
@@ -236,6 +242,9 @@ public class Server extends Observable implements Runnable
                                 DatabaseManager.getInstance().update(user);
                                 client.objectOutputToClient.writeObject(user);
 
+                                //update ClientConnection username attribute
+                                client.clientsUserName = user.getUsername();
+
                                 //send message to server GUI
                                 sendToServerGUI(loginMsg);
                             }
@@ -279,6 +288,9 @@ public class Server extends Observable implements Runnable
                                 returnedUser.setPassword(reactivateMsg.getUser().getPassword());
                                 DatabaseManager.getInstance().update(returnedUser);
 
+                                //update ClientConnection username attribute
+                                client.clientsUserName = returnedUser.getUsername();
+
                                 //send to server GUI
                                 sendToServerGUI(reactivateMsg);
                             }
@@ -291,10 +303,11 @@ public class Server extends Observable implements Runnable
                     else if(nextMsg instanceof UpdateUserMsg)
                     {
                         UpdateUserMsg updateUserMsg = (UpdateUserMsg) nextMsg;
-                        Object returnedUser = DatabaseManager.getInstance().update(updateUserMsg.getUser());
+                        User returnedUser = (User) DatabaseManager.getInstance().update(updateUserMsg.getUser());
                         if(returnedUser != null)
                         {
                             client.objectOutputToClient.writeBoolean(true);
+                            client.clientsUserName = returnedUser.getUsername(); //update ClientConnection username attribute
                             sendToServerGUI(updateUserMsg);
                         }
                         else
