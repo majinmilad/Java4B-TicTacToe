@@ -39,7 +39,9 @@ public class serverModifyUsersController implements Initializable {
     @FXML
     void deleteButtonClicked(ActionEvent event)
     {
-        User user = (User) DatabaseManager.getInstance().getUser(usersList.getSelectionModel().getSelectedItem());
+
+        User user = new User(usersList.getSelectionModel().getSelectedItem());
+        user = (User) DatabaseManager.getInstance().get(user);
         if(user != null)
         {
             DeleteUserMsg deleteUserMsg = new DeleteUserMsg(user);

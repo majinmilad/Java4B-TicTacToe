@@ -21,6 +21,12 @@ public class User extends BaseModel
         userUUID = "";
     }
 
+    public User(String username)
+    {
+        userUUID = "";
+        this.username = username;
+    }
+
     public User(String username, String password, String firstName, String lastName)
     {
         setUsername(username);
