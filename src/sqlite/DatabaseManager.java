@@ -17,7 +17,7 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:Database/TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
             // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\Java4B-TicTacToe\Database\TicTacToeDB.db
             // Phill: Database/TicTacToeDB.db
             // Kenny:
@@ -250,15 +250,18 @@ public class DatabaseManager implements DataSource {
         }
         else if (obj instanceof GameViewers)
         {
-            qryBuilder.append("FROM GameViewers ");
+            GameViewers gv = (GameViewers) obj;
+
+            qryBuilder.append("FROM GameViewers " +
+                              "WHERE viewerId = \'" + gv.getId() + "\' " );
 
             try {
                     ResultSet rs = executeQuery(qryBuilder.toString());
 
                     while(rs.next())
                     {
-                        GameViewers gv = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
-                        list.add(gv);
+                        GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
+                        list.add(gameViewers);
                     }
 
             } catch (SQLException e) {
@@ -311,15 +314,35 @@ public class DatabaseManager implements DataSource {
                               "FROM Game " +
                                filter);
 
+            /*
+                    @ To get a plyer's game history
+                    "WHERE p1Id = \'" +  playerID  + "\' "
+                   + OR p2Id = \'" +  playerID + "\' "
+
+                    @ To Get Active Games
+                    "WHERE endTime != NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To Get Completed Games
+                    "WHERE endTime = NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To See if Player is playing
+                     "WHERE p1Id = \'" +  playerID  + "\' "
+                   + "OR p2Id = \'" +  playerID + "\' "
+                   + "AND endTime != NULL "
+
+             */
+
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
                     Game game = new Game((rs.getString("gameId")), rs.getString("startTime"),
-                                         rs.getString("endTime"), Integer.parseInt(rs.getString("p1Id")),
-                                        Integer.parseInt(rs.getString("p2Id")),
-                                        Integer.parseInt(rs.getString("starterId")),Integer.parseInt(rs.getString("winnerId")));
+                                         rs.getString("endTime"), (rs.getString("p1Id")),
+                                        (rs.getString("p2Id")), (rs.getString("starterId")),
+                                        (rs.getString("winnerId")));
                     list.add(game);
                 }
 

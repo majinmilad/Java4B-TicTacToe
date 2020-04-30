@@ -12,12 +12,11 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import modules.User;
-import sqlite.DatabaseManager;
 
 import java.io.IOException;
 import java.util.Optional;
 
-public class addUserController {
+public class createAccountWindowController {
 
     @FXML
     private Button createUser;
@@ -120,7 +119,7 @@ public class addUserController {
 
     @FXML
     void backButtonClicked(ActionEvent event) throws IOException {
-        Parent mainWindow = FXMLLoader.load(getClass().getResource("mainWindow.fxml"));
+        Parent mainWindow = FXMLLoader.load(getClass().getResource("primaryWindow.fxml"));
         Scene mainScene = new Scene(mainWindow);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(mainScene);

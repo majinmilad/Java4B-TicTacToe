@@ -9,12 +9,12 @@ public class Game extends BaseModel {
 //    private int  gameId;
     private String startTime;
     private String endTime;
-    private int  p1Id;
-    private int p2Id;
-    private int starterId;
-    private int winnerId;
+    private String  p1Id;
+    private String p2Id;
+    private String starterId;
+    private String winnerId;
 
-    Game(int p1) {
+    Game(String p1) {
         startTime = "";
         endTime   = "";
         setP1Id(p1);
@@ -22,7 +22,7 @@ public class Game extends BaseModel {
 
     }
 
-    public Game(String gameId, String sTime, String eTime, int p1, int p2, int starter, int winner)
+    public Game(String gameId, String sTime, String eTime, String p1, String p2, String starter, String winner)
     {
         setId(gameId);
         recallTimes(sTime,eTime);
@@ -52,35 +52,35 @@ public class Game extends BaseModel {
         startTime = dateFormat.format(started);
     }
 
-    public int getP1Id() {
+    public String getP1Id() {
         return p1Id;
     }
 
-    public void setP1Id(int p1Id) {
+    public void setP1Id(String p1Id) {
         this.p1Id = p1Id;
     }
 
-    public int getP2Id() {
+    public String getP2Id() {
         return p2Id;
     }
 
-    public void setP2Id(int p2Id) {
+    public void setP2Id(String p2Id) {
         this.p2Id = p2Id;
     }
 
-    public int getStarterId() {
+    public String getStarterId() {
         return starterId;
     }
 
-    public void setStarterId(int starterId) {
+    public void setStarterId(String starterId) {
         this.starterId = starterId;
     }
 
-    public int getWinnerId() {
+    public String getWinnerId() {
         return winnerId;
     }
 
-    public void setWinnerId(int winnerId) {
+    public void setWinnerId(String winnerId) {
         this.winnerId = winnerId;
     }
 

@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class mainWindowController {
+public class primaryWindowController {
 
     @FXML
     private Button createAccountButton;
@@ -22,7 +22,7 @@ public class mainWindowController {
     @FXML
     void createAccountClicked(ActionEvent event) throws IOException
     {
-        Parent addUserWindow = FXMLLoader.load(getClass().getResource("addUserWindow.fxml"));
+        Parent addUserWindow = FXMLLoader.load(getClass().getResource("createAccountWindow.fxml"));
         Scene addUserScene = new Scene(addUserWindow);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(addUserScene);

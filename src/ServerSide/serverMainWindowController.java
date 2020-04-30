@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -56,10 +55,10 @@ public class serverMainWindowController implements Observer, Initializable {
     @FXML
     void modifyUserButtonClicked(ActionEvent event) throws IOException
     {
-        //NEED TO OPEN THIS IN ANOTHER WINDOW, NOT THE SAME WINDOW
-        Parent modifyUsersRoot = FXMLLoader.load(getClass().getResource("serverUsers.fxml"));
+        // open modify users in new window
+        Parent modifyUsersRoot = FXMLLoader.load(getClass().getResource("serverModifyUsers.fxml"));
         Scene modifyUsersScene = new Scene(modifyUsersRoot);
-        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Stage window = new Stage();
         window.setScene(modifyUsersScene);
         window.show();
     }
@@ -96,6 +95,7 @@ public class serverMainWindowController implements Observer, Initializable {
                 else if(arg instanceof DeleteUserMsg)
                 {
                     messageBox.appendText("user \"" + ((DeleteUserMsg) arg).getUser().getUsername() + "\" deleted their account (account deactivated)\n\n");
+                    refreshButtonClicked(new ActionEvent());
                 }
                 else if(arg instanceof LogoutMsg)
                 {
@@ -109,6 +109,7 @@ public class serverMainWindowController implements Observer, Initializable {
                 else if(arg instanceof UpdateUserMsg)
                 {
                     messageBox.appendText("user \"" + ((UpdateUserMsg) arg).getUser().getUsername() + "\" has updated their account\n\n");
+					refreshButtonClicked(new ActionEvent());
                 }
             }
         });

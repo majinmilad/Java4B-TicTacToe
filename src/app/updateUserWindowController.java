@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class updateWindowController implements Initializable {
+public class updateUserWindowController implements Initializable {
 
     @FXML
     private TextField username;
@@ -94,7 +94,7 @@ public class updateWindowController implements Initializable {
 
     @FXML
     void backButtonClicked(ActionEvent event) throws IOException {
-        Parent menuWindow = FXMLLoader.load(getClass().getResource("menuWindow.fxml"));
+        Parent menuWindow = FXMLLoader.load(getClass().getResource("accountSettingsWindow.fxml"));
         Scene menuScene = new Scene(menuWindow);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(menuScene);

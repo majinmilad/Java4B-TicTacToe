@@ -17,6 +17,12 @@ public class ServerMain extends Application
         Parent root = FXMLLoader.load(getClass().getResource("../ServerSide/serverMainWindow.fxml"));
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+
+        //shutdown Server upon exiting the window
+        primaryStage.setOnCloseRequest(anonymF ->
+        {
+            //figure out a way to shutdown the server when server GUI is closed
+        });
     }
 
     public static void main(String[] args) throws SQLException
