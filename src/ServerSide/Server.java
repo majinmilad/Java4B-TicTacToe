@@ -124,11 +124,16 @@ public class Server extends Observable implements Runnable
                 if(e instanceof IOException) //client program disconnected
                 {
                     //logoff the client
-                    User returnedUser = (User) DatabaseManager.getInstance().getUser(clientsUserName);
-                    returnedUser.setStatus("OFFLINE");
-                    DatabaseManager.getInstance().update(returnedUser);
-                    //send to server GUI
-                    sendToServerGUI(new LogoutMsg(returnedUser));
+                    User searchUser = new User(clientsUserName);
+                    User returnedUser = (User) DatabaseManager.getInstance().get(searchUser);
+                    if(returnedUser.getStatus().equals("ONLINE"))
+                    {
+                        returnedUser.setStatus("OFFLINE");
+                        DatabaseManager.getInstance().update(returnedUser);
+                        //send to server GUI
+                        sendToServerGUI(new LogoutMsg(returnedUser));
+                    }
+
                     //remove their connection from map
                     clientMap.remove(connectionID);
                 }
@@ -184,7 +189,8 @@ public class Server extends Observable implements Runnable
                     {
                         RegistrationMsg regMsg = (RegistrationMsg) nextMsg;
 
-                        User returnedUser = (User) DatabaseManager.getInstance().getUser(regMsg.getUser().getUsername());
+                        User returnedUser = new User(regMsg.getUser().getUsername());
+                        returnedUser = (User) DatabaseManager.getInstance().get(returnedUser);
 
                         if(returnedUser == null) //account does not exist
                         {
@@ -237,7 +243,8 @@ public class Server extends Observable implements Runnable
                                 client.objectOutputToClient.writeBoolean(false);
 
                                 //set user to ONLINE status and send the user info
-                                User user = (User) DatabaseManager.getInstance().getUser(loginMsg.getUsername());
+                                User user = new User(loginMsg.getUsername());
+                                user = (User) DatabaseManager.getInstance().get(user);
                                 user.setStatus("ONLINE");
                                 DatabaseManager.getInstance().update(user);
                                 client.objectOutputToClient.writeObject(user);
@@ -275,7 +282,8 @@ public class Server extends Observable implements Runnable
                     else if(nextMsg instanceof ReactivateUserMsg)
                     {
                         ReactivateUserMsg reactivateMsg = (ReactivateUserMsg) nextMsg;
-                        User returnedUser = (User) DatabaseManager.getInstance().getUser(reactivateMsg.getUser().getUsername());
+                        User returnedUser = new User(reactivateMsg.getUser().getUsername());
+                        returnedUser = (User) DatabaseManager.getInstance().get(returnedUser);
 
                         if(returnedUser != null) //account does exists
                         {

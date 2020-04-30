@@ -21,6 +21,12 @@ public class User extends BaseModel
         userUUID = "";
     }
 
+    public User(String username)
+    {
+        userUUID = "";
+        setUsername(username);
+    }
+
     public User(String username, String password, String firstName, String lastName)
     {
         setUsername(username);
@@ -43,11 +49,6 @@ public class User extends BaseModel
         setCreated(created);
         userUUID = id;
     }
-
-//    public User(String username)
-//    {
-//        setUsername(username);
-//    }
 
     public void setUsername(String username)
     {
@@ -81,11 +82,6 @@ public class User extends BaseModel
     {
         created = s;
     }
-
-//    public void setUserID(int id)
-//    {
-//        userID = id;
-//    }
 
     public void setStatus(String status)
     {
