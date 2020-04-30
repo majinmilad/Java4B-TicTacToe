@@ -109,6 +109,7 @@ public class serverMainWindowController implements Observer, Initializable {
                 else if(arg instanceof UpdateUserMsg)
                 {
                     messageBox.appendText("user \"" + ((UpdateUserMsg) arg).getUser().getUsername() + "\" has updated their account\n\n");
+					refreshButtonClicked(new ActionEvent());
                 }
             }
         });
