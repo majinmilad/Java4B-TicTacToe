@@ -59,17 +59,18 @@ public class loginWindowController {
                 mainMenuWindowStage.setScene(mainMenuScene);
                 mainMenuWindowStage.show();
 
+                //KEEP THIS COMMENT FOR NOW, may need it
                 //set logout upon exiting the menu window
-                mainMenuWindowStage.setOnCloseRequest(anonymF ->
-                {
-                    try {
-                        Global.toServer.writeObject(new LogoutMsg(Global.CurrentAccount.getCurrentUser()));
-                        Global.toServer.flush();
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+//                mainMenuWindowStage.setOnCloseRequest(anonymF ->
+//                {
+//                    try {
+//                        Global.toServer.writeObject(new LogoutMsg(Global.CurrentAccount.getCurrentUser()));
+//                        Global.toServer.flush();
+//                    }
+//                    catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                });
             }
             else
             {
