@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 public class gameWindowController implements Initializable {
 
     private boolean isFirstPlayer = true;
+
     @FXML
     Button b1;
     @FXML
@@ -70,6 +71,19 @@ public class gameWindowController implements Initializable {
     static int player1Score = 0;
     static int player2Score = 0;
     static int tieScore     = 0;
+
+    @Override
+    public void initialize(URL x, ResourceBundle y)
+    {
+        //send server what type of game it is
+        //
+
+
+
+//        Server server = Server.getInstance();
+//        server.addObserver(this);
+//        refreshButtonClicked(new ActionEvent());
+    }
 
     public void initializeName(String p1, String p2)
     {
@@ -198,6 +212,10 @@ public class gameWindowController implements Initializable {
 
     public void buttonClickHandler(ActionEvent evt)
     {
+
+
+
+
         String winner;
 
         Button clickedButton = (Button) evt.getTarget();
@@ -361,12 +379,6 @@ public class gameWindowController implements Initializable {
         menuWindow.show();
 
         resetScore();
-    }
-
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
     }
 }
 

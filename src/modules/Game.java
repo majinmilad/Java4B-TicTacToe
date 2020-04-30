@@ -5,14 +5,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Game extends BaseModel {
-//    private int  gameId;
+public class Game extends BaseModel
+{
     private String startTime;
     private String endTime;
-    private String  p1Id;
+    private String p1Id;
     private String p2Id;
     private String starterId;
     private String winnerId;
+//    private final String gameId;
 
     Game(String p1) {
         startTime = "";

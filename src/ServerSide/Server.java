@@ -125,10 +125,14 @@ public class Server extends Observable implements Runnable
                 {
                     //logoff the client
                     User returnedUser = (User) DatabaseManager.getInstance().getUser(clientsUserName);
-                    returnedUser.setStatus("OFFLINE");
-                    DatabaseManager.getInstance().update(returnedUser);
-                    //send to server GUI
-                    sendToServerGUI(new LogoutMsg(returnedUser));
+                    if(returnedUser.getStatus().equals("ONLINE"))
+                    {
+                        returnedUser.setStatus("OFFLINE");
+                        DatabaseManager.getInstance().update(returnedUser);
+                        //send to server GUI
+                        sendToServerGUI(new LogoutMsg(returnedUser));
+                    }
+
                     //remove their connection from map
                     clientMap.remove(connectionID);
                 }
