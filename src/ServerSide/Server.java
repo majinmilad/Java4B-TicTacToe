@@ -124,12 +124,15 @@ public class Server extends Observable implements Runnable
                 if(e instanceof IOException) //client program disconnected
                 {
                     //logoff the client
-                    User returnedUser = new User(clientsUserName);
-                    returnedUser = (User) DatabaseManager.getInstance().get(returnedUser);
-                    returnedUser.setStatus("OFFLINE");
-                    DatabaseManager.getInstance().update(returnedUser);
-                    //send to server GUI
-                    sendToServerGUI(new LogoutMsg(returnedUser));
+                    User returnedUser = (User) DatabaseManager.getInstance().getUser(clientsUserName);
+                    if(returnedUser.getStatus().equals("ONLINE"))
+                    {
+                        returnedUser.setStatus("OFFLINE");
+                        DatabaseManager.getInstance().update(returnedUser);
+                        //send to server GUI
+                        sendToServerGUI(new LogoutMsg(returnedUser));
+                    }
+
                     //remove their connection from map
                     clientMap.remove(connectionID);
                 }

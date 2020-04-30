@@ -31,13 +31,7 @@ public class serverMainWindowController implements Observer, Initializable {
     private TextArea onlineUserBox;
 
     @FXML
-    private Button addUserButton;
-
-    @FXML
     private Button modifyUserButton;
-
-    @FXML
-    private Button refreshButton;
 
     @Override
     public void initialize(URL x, ResourceBundle y)
@@ -109,7 +103,7 @@ public class serverMainWindowController implements Observer, Initializable {
                 else if(arg instanceof UpdateUserMsg)
                 {
                     messageBox.appendText("user \"" + ((UpdateUserMsg) arg).getUser().getUsername() + "\" has updated their account\n\n");
-					refreshButtonClicked(new ActionEvent());
+                    refreshButtonClicked(new ActionEvent());
                 }
             }
         });

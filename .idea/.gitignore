@@ -1,13 +1,2 @@
-# Project exclude paths
-/.
-
-
-
-
 # Default ignored files
 /workspace.xml
-
-# Project exclude paths
-/.
-# Datasource local storage ignored files
-/dataSources.local.xml
