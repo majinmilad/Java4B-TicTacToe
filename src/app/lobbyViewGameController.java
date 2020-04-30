@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class loginViewController {
+public class lobbyViewGameController {
 
     @FXML
     private Button backButton;

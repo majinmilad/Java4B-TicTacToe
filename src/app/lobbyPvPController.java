@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class loginPvPController {
+public class lobbyPvPController {
 
     @FXML
     private Button backButton;

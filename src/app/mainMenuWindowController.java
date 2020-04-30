@@ -49,7 +49,7 @@ public class mainMenuWindowController {
 //        boardWindow.setScene(boardScene);
 //        boardWindow.show();
         //return to main window
-        Parent mainWindow = FXMLLoader.load(getClass().getResource("lobbyPVPWindow.fxml"));
+        Parent mainWindow = FXMLLoader.load(getClass().getResource("lobbyPvPWindow.fxml"));
         Scene mainScene = new Scene(mainWindow);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(mainScene);
@@ -77,7 +77,7 @@ public class mainMenuWindowController {
     @FXML
     void watchGamesButtonClicked(ActionEvent event) throws IOException
     {
-        Parent mainWindow = FXMLLoader.load(getClass().getResource("lobbyViewWindow.fxml"));
+        Parent mainWindow = FXMLLoader.load(getClass().getResource("lobbyViewGameWindow.fxml"));
         Scene mainScene = new Scene(mainWindow);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(mainScene);
