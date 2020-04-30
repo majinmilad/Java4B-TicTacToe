@@ -31,13 +31,7 @@ public class serverMainWindowController implements Observer, Initializable {
     private TextArea onlineUserBox;
 
     @FXML
-    private Button addUserButton;
-
-    @FXML
     private Button modifyUserButton;
-
-    @FXML
-    private Button refreshButton;
 
     @Override
     public void initialize(URL x, ResourceBundle y)

@@ -17,7 +17,7 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:/Users/kennethcasimiro/Documents/GitHub/Java4B-TicTacToe/Database/TicTacToeDB.db");
             // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\Java4B-TicTacToe\Database\TicTacToeDB.db
             // Phill: Database/TicTacToeDB.db
             // Kenny:
