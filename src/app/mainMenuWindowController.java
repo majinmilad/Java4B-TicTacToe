@@ -35,20 +35,26 @@ public class mainMenuWindowController {
     {
         //CHANGES...
         //give option for local or remote
-        //add lobby window in between
+        //add windows in between
+//        FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
+//        Parent boardParent = loader.load();
+//
+//        gameWindowController setController = loader.getController();
+//        setController.initializeName("Player 1", "Player 2");
+//
+//        Scene boardScene = new Scene(boardParent, 950, 775);
+//        boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+//
+//        Stage boardWindow = new Stage();
+//        boardWindow.setScene(boardScene);
+//        boardWindow.show();
+        //return to main window
+        Parent mainWindow = FXMLLoader.load(getClass().getResource("lobbyPVPWindow.fxml"));
+        Scene mainScene = new Scene(mainWindow);
+        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        window.setScene(mainScene);
+        window.show();
 
-        FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
-        Parent boardParent = loader.load();
-
-        gameWindowController setController = loader.getController();
-        setController.initializeName("Player 1", "Player 2");
-
-        Scene boardScene = new Scene(boardParent, 950, 775);
-        boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
-
-        Stage boardWindow = new Stage();
-        boardWindow.setScene(boardScene);
-        boardWindow.show();
     }
 
     @FXML
@@ -69,9 +75,13 @@ public class mainMenuWindowController {
     }
 
     @FXML
-    void watchGamesButtonClicked(ActionEvent event)
+    void watchGamesButtonClicked(ActionEvent event) throws IOException
     {
-
+        Parent mainWindow = FXMLLoader.load(getClass().getResource("lobbyViewWindow.fxml"));
+        Scene mainScene = new Scene(mainWindow);
+        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        window.setScene(mainScene);
+        window.show();
     }
 
     @FXML
