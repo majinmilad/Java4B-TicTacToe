@@ -18,7 +18,7 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\Phillip\\Documents\\GitHub\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
             // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\Java4B-TicTacToe\Database\TicTacToeDB.db
             // Phill: Database/TicTacToeDB.db
             // Kenny:
@@ -73,8 +73,8 @@ public class DatabaseManager implements DataSource {
         {
             Game g = (Game) obj;
 
-            qryBuilder.append("Game (p1Id, startTime, creatorId, gameStatus, UUID) " +
-                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getStartTime() + "\', \'" + g.getCreatorId() + "\', \'RUNNING\', \'" + g.getGameId() + "\')");
+            qryBuilder.append("Game (p1Id, p2Id, startTime, creatorId, gameStatus, UUID) " +
+                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getP2Id() + "\', \'"  + g.getStartTime() + "\', \'" + g.getCreatorId() + "\', \'RUNNING\', \'" + g.getGameId() + "\')");
         }
         else if(obj instanceof Moves)
         {
@@ -119,7 +119,15 @@ public class DatabaseManager implements DataSource {
                     + u.getFirstName() + "\', lName = \'"    + u.getLastName() + "\', status = \'"
                     + u.getStatus()    + "\' "               +
                     "WHERE UUID = \'" + u.getUserID() + "\'");
+
         }
+        else if (obj instanceof User)
+        {
+            Game g = (Game) obj;
+
+            qryBuilder.append("Game "+
+                              "SET winnerId = \'" + g.getWinnerId() + "\', endTime = \'" + g.getEndTime() +"\', gameStatus = \'" + g.getStatus() + "\' ");
+            }
 
         try {
             executeUpdate(qryBuilder.toString());
@@ -128,8 +136,9 @@ public class DatabaseManager implements DataSource {
         } catch (SQLException e) {
             System.out.println("Unsuccessful update to db");
             e.printStackTrace();
-            return null;
         }
+
+        return null;
     }
 
 
@@ -262,7 +271,6 @@ public class DatabaseManager implements DataSource {
             } catch (SQLException e) {
                 System.out.println("Unsuccessful User query");
                 e.printStackTrace();
-                return null;
             }
         }
         else if (obj instanceof Game)
@@ -301,7 +309,6 @@ public class DatabaseManager implements DataSource {
             } catch (SQLException e) {
                 System.out.println("Unsuccessful Game query");
                 e.printStackTrace();
-                return null;
             }
         }
 

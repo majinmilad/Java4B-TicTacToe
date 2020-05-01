@@ -327,7 +327,19 @@ public class Server extends Observable implements Runnable
                     else if(nextMsg instanceof NewGameMsg)
                     {
                         NewGameMsg newGameMsg = (NewGameMsg) nextMsg;
-                        Game newGame = new Game(newGameMsg.getCreator());
+                        Game newGame;
+                        if(newGameMsg.getGameType() == "COMPUTER" )
+                        {
+                            newGame = new Game(newGameMsg.getCreator(), "computer");
+                        }
+                        else if (newGameMsg.getGameType() == "LOCAL")
+                        {
+                            newGame = new Game(newGameMsg.getCreator(), "local player");
+                        }
+                        else
+                        {
+                            newGame = new Game(newGameMsg.getCreator());
+                        }
 
                         //check if player has a game open
                         User player1 = (User) DatabaseManager.getInstance().get(new User(client.clientsUserName));
@@ -347,6 +359,11 @@ public class Server extends Observable implements Runnable
                             client.objectOutputToClient.writeObject(new UserHasGameOpenMsg());
 
                         client.objectOutputToClient.flush();
+                    }
+                    else if(nextMsg instanceof gameEndedMsg)
+                    {
+
+
                     }
                 }
                 catch (InterruptedException | IOException e) {

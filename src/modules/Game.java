@@ -10,19 +10,32 @@ public class Game extends BaseModel
 {
     private String p1Id;
     private String p2Id;
-    private final String startTime;
+    private  String startTime;
     private String endTime;
     private String creatorId;
     private String winnerId;
     private final String gameId;
+    private String status;
 
     //create a brand new game
     public Game(User player1)
     {
         p1Id = player1.getUserID();
         creatorId = player1.getUserID();
+        startTime = null;
+        gameId = UUID.randomUUID().toString();
+        status = "WAITING";
+    }
+
+    // Create a new game w/ Computer or Local
+    public Game(User player1, String player2)
+    {
+        p1Id = player1.getUserID();
+        p2Id = player2;
+        creatorId = player1.getUserID();
         startTime = generateTime();
         gameId = UUID.randomUUID().toString();
+        status = "RUNNING";
     }
 
     //create a game and set all attributes
@@ -65,6 +78,8 @@ public class Game extends BaseModel
     public String getGameId() {
         return gameId;
     }
+
+    public String getStatus(){ return status;}
 
     // setters
     public void setP1Id(String p1Id) {

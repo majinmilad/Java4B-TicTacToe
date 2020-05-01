@@ -1,6 +1,9 @@
 package app;
 
+import Messages.GameCreatedMsg;
 import Messages.LogoutMsg;
+import Messages.NewGameMsg;
+import Messages.UserHasGameOpenMsg;
 import TicTacToe.gameWindowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,10 +11,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class mainMenuWindowController {
 
@@ -42,20 +48,41 @@ public class mainMenuWindowController {
     }
 
     @FXML
-    void pvcButtonClicked(ActionEvent event) throws IOException
-    {
-        FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
-        Parent boardParent = loader.load();
+    void pvcButtonClicked(ActionEvent event) throws IOException, ClassNotFoundException {
+        // Create a game request for computer
+        NewGameMsg newGameMsg = new NewGameMsg("COMPUTER", Global.CurrentAccount.getCurrentUser());
 
-        gameWindowController setController = loader.getController();
-        setController.initializeName("Player 1", "Computer");
+        //send game request to server
+        Global.toServer.writeObject(newGameMsg);
+        Global.toServer.flush();
 
-        Scene boardScene = new Scene(boardParent, 950, 775);
-        boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+        //receive response from server
+        Object response = Global.fromServer.readObject();
 
-        Stage boardWindow = new Stage();
-        boardWindow.setScene(boardScene);
-        boardWindow.show();
+        if(response instanceof GameCreatedMsg)
+        {
+            FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
+            Parent boardParent = loader.load();
+
+            gameWindowController setController = loader.getController();
+            setController.initializeName("Player 1", "Computer");
+
+            Scene boardScene = new Scene(boardParent, 950, 775);
+            boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+
+            Stage boardWindow = new Stage();
+            boardWindow.setScene(boardScene);
+            boardWindow.show();
+        }
+        else if(response instanceof UserHasGameOpenMsg)
+        {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
+            alert.setTitle("Game in Progress");
+            alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
+            Optional<ButtonType> buttonResult = alert.showAndWait();
+        }
+
+
     }
 
     @FXML

@@ -23,4 +23,9 @@ public class NewGameMsg extends Message
     public User getCreator() {
         return player1;
     }
+
+    public String getGameType()
+    {
+        return gameType;
+    }
 }
