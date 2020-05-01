@@ -33,28 +33,12 @@ public class mainMenuWindowController {
     @FXML
     void pvpButtonClicked(ActionEvent event) throws IOException
     {
-        //CHANGES...
-        //give option for local or remote
-        //add windows in between
-//        FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
-//        Parent boardParent = loader.load();
-//
-//        gameWindowController setController = loader.getController();
-//        setController.initializeName("Player 1", "Player 2");
-//
-//        Scene boardScene = new Scene(boardParent, 950, 775);
-//        boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
-//
-//        Stage boardWindow = new Stage();
-//        boardWindow.setScene(boardScene);
-//        boardWindow.show();
-        //return to main window
-        Parent mainWindow = FXMLLoader.load(getClass().getResource("lobbyPvPWindow.fxml"));
-        Scene mainScene = new Scene(mainWindow);
+        //go to player v. player lobby window
+        Parent playerLobbyWindow = FXMLLoader.load(getClass().getResource("lobbyPvPWindow.fxml"));
+        Scene playerLobbyScene = new Scene(playerLobbyWindow);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        window.setScene(mainScene);
+        window.setScene(playerLobbyScene);
         window.show();
-
     }
 
     @FXML

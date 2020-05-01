@@ -14,6 +14,7 @@ public class DatabaseManager implements DataSource {
         return connection;
     }
 
+
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -27,6 +28,7 @@ public class DatabaseManager implements DataSource {
         }
 
     }
+
 
     public static DatabaseManager getInstance()
     {
@@ -50,12 +52,12 @@ public class DatabaseManager implements DataSource {
         }
 
         return instance;
-
     }
 
 
     @Override
-    public BaseModel insert(BaseModel obj) {
+    public BaseModel insert(BaseModel obj)
+    {
         StringBuilder qryBuilder = new StringBuilder();
         qryBuilder.append("INSERT INTO ");
 
@@ -71,8 +73,8 @@ public class DatabaseManager implements DataSource {
         {
             Game g = (Game) obj;
 
-            qryBuilder.append("Game (id,p1Id,starterId) " +
-                    "VALUES (" + g.getId() + ", " + g.getP1Id() + ", " + g.getStarterId() + ')');
+            qryBuilder.append("Game (p1Id, startTime, creatorId, gameStatus, UUID) " +
+                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getStartTime() + "\', \'" + g.getCreatorId() + "\', \'RUNNING\', \'" + g.getGameId() + "\')");
         }
         else if(obj instanceof Moves)
         {
@@ -92,37 +94,10 @@ public class DatabaseManager implements DataSource {
 
         try {
             executeInsert(qryBuilder.toString());
-            System.out.println("Insertion worked\n\n");
+            System.out.println("Successful insertion into db\n");
             return obj;
         } catch (SQLException e) {
-            System.out.println("error executing insert\n\n");
-            e.printStackTrace();
-            return null;
-        }
-
-    }
-
-    @Override
-    public BaseModel delete(BaseModel obj) {
-        StringBuilder qryBuilder = new StringBuilder();
-        qryBuilder.append("UPDATE ");
-
-        if(obj instanceof User)
-        {
-            User u = (User) obj;
-
-            qryBuilder.append("User " +
-                    "SET status = 'INACTIVE' " +
-                    "WHERE UUID = \'" + u.getUserID() + "\'");
-        }
-
-        try
-        {
-            executeDelete(qryBuilder.toString());
-            System.out.println("DELETED SUCCESS\n\n");
-            return obj;
-        } catch (SQLException e) {
-            System.out.println("DELETED FAIL\n\n");
+            System.out.println("Unsuccessful insertion into db");
             e.printStackTrace();
             return null;
         }
@@ -130,7 +105,8 @@ public class DatabaseManager implements DataSource {
 
 
     @Override
-    public BaseModel update(BaseModel obj) {
+    public BaseModel update(BaseModel obj)
+    {
         StringBuilder qryBuilder = new StringBuilder();
         qryBuilder.append("UPDATE ");
 
@@ -147,66 +123,46 @@ public class DatabaseManager implements DataSource {
 
         try {
             executeUpdate(qryBuilder.toString());
-            System.out.println("UPDATE QUERY Successful\n\n");
+            System.out.println("Successful update to db\n");
             return obj;
         } catch (SQLException e) {
+            System.out.println("Unsuccessful update to db");
             e.printStackTrace();
-            System.out.println("UNABLE to update QUERY");
             return null;
         }
     }
 
-    @Override
-    public BaseModel get(BaseModel obj) {
-        StringBuilder qryBuilder = new StringBuilder();
-        qryBuilder.append("SELECT *");
 
-        if (obj instanceof User)
+    @Override
+    public BaseModel delete(BaseModel obj)
+    {
+        StringBuilder qryBuilder = new StringBuilder();
+        qryBuilder.append("UPDATE ");
+
+        if(obj instanceof User)
         {
             User u = (User) obj;
-            qryBuilder.append("FROM User " + "WHERE userName = \'" + u.getUsername() + "\' ");
 
-            try {
-                ResultSet rs = executeQuery(qryBuilder.toString());
-
-                rs.next();
-                User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"),
-                        rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
-
-                return user;
-            } catch (SQLException e) {
-                System.out.println("exception in getUser()");
-                e.printStackTrace();
-            }
-
-        }
-        else if (obj instanceof Game)
-        {
-            Game g = (Game) obj;
-            qryBuilder.append("FROM Game " + "WHERE id = \'" + g.getId() + "\'" );
-
-            try {
-                ResultSet rs = executeQuery(qryBuilder.toString());
-
-                rs.next();
-                Game game = new Game((rs.getString("gameId")), rs.getString("startTime"),
-                        rs.getString("endTime"), (rs.getString("p1Id")),
-                        (rs.getString("p2Id")), (rs.getString("starterId")),
-                        (rs.getString("winnerId")));
-
-                return game;
-            } catch (SQLException e) {
-                System.out.println("exception in getUser()");
-                e.printStackTrace();
-            }
+            qryBuilder.append("User " +
+                    "SET status = 'INACTIVE' " +
+                    "WHERE UUID = \'" + u.getUserID() + "\'");
         }
 
-        return null;
+        try {
+            executeDelete(qryBuilder.toString());
+            System.out.println("Successful delete in db\n");
+            return obj;
+        } catch (SQLException e) {
+            System.out.println("Unsuccessful delete in db");
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    @Override
-    public BaseModel authenticate(String username, String password) {
 
+    @Override
+    public BaseModel authenticate(String username, String password)
+    {
         String query = "SELECT * "
                 +  "FROM User "
                 +  "WHERE userName = \'" + username + "\' "
@@ -215,19 +171,147 @@ public class DatabaseManager implements DataSource {
 
         try {
             ResultSet rs = executeQuery(query);
-            User u = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"), rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
-            System.out.println("User Authenticated\n\n");
+
+            User u = new User(rs.getString("userName"), rs.getString("password"),
+                    rs.getString("fName"), rs.getString("lName"),
+                    rs.getString("status"), rs.getString("UUID"),
+                    rs.getString("dateCreated"));
+
+            System.out.println("User login authenticated\n");
             return u;
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.printf("User Not Authenticated\n\n");
+            System.out.printf("User login not authenticated");
             return null;
         }
-
     }
 
+
     @Override
-    public List <BaseModel> list(BaseModel obj) {
+    public BaseModel get(BaseModel obj)
+    {
+        StringBuilder qryBuilder = new StringBuilder();
+        qryBuilder.append("SELECT *");
+
+        if (obj instanceof User)
+        {
+            User u = (User) obj;
+            qryBuilder.append("FROM User " + "WHERE userName = \'" + u.getUsername() + "\'");
+
+            try {
+                ResultSet rs = executeQuery(qryBuilder.toString());
+                rs.next();
+
+                User user = new User(rs.getString("userName"), rs.getString("password"),
+                        rs.getString("fName"), rs.getString("lName"),
+                        rs.getString("status"), rs.getString("UUID"),
+                        rs.getString("dateCreated"));
+
+                return user;
+            } catch (SQLException e) {
+                System.out.println("exception in get()");
+                e.printStackTrace();
+            }
+        }
+        else if (obj instanceof Game)
+        {
+//            Game g = (Game) obj;
+//            qryBuilder.append("FROM Game " + "WHERE id = \'" + g.getId() + "\'" );
+//
+//            try {
+//                ResultSet rs = executeQuery(qryBuilder.toString());
+//
+//                rs.next();
+//                Game game = new Game((rs.getString("gameId")), rs.getString("startTime"),
+//                        rs.getString("endTime"), (rs.getString("p1Id")),
+//                        (rs.getString("p2Id")), (rs.getString("starterId")),
+//                        (rs.getString("winnerId")));
+//
+//                return game;
+//            } catch (SQLException e) {
+//                System.out.println("exception in getUser()");
+//                e.printStackTrace();
+//            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public BaseModel query(BaseModel obj, String filter)
+    {
+        StringBuilder qryBuilder = new StringBuilder();
+        qryBuilder.append("SELECT ");
+
+        if(obj instanceof User)
+        {
+            qryBuilder.append("* FROM User " + filter + " LIMIT 1");
+
+            try {
+                ResultSet rs = executeQuery(qryBuilder.toString());
+                rs.next();
+
+                User user = new User(rs.getString("userName"), rs.getString("password"),
+                        rs.getString("fName"), rs.getString("lName"),
+                        rs.getString("status"), rs.getString("UUID"),
+                        rs.getString("dateCreated"));
+
+                System.out.println("Successful User query");
+                return user;
+            } catch (SQLException e) {
+                System.out.println("Unsuccessful User query");
+                e.printStackTrace();
+                return null;
+            }
+        }
+        else if (obj instanceof Game)
+        {
+            qryBuilder.append("* FROM Game " + filter + " LIMIT 1");
+
+            /*
+                    @ To get game history
+                    "WHERE p1Id = \'" +  playerID  + "\' "
+                   + OR p2Id = \'" +  playerID + "\' "
+
+                    @ To Get Active Games
+                    "WHERE endTime != NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To Get Completed Games
+                    "WHERE endTime = NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To See if Player is playing
+                     "WHERE p1Id = \'" +  playerID  + "\' "
+                   + "OR p2Id = \'" +  playerID + "\' "
+                   + "AND endTime != NULL "
+             */
+
+            try {
+                ResultSet rs = executeQuery(qryBuilder.toString());
+
+                Game game = new Game(rs.getString("p1Id"), rs.getString("p2Id"),
+                        rs.getString("startTime"), rs.getString("endTime"),
+                        rs.getString("creatorId"), rs.getString("winnerId"),
+                        rs.getString("UUID"));
+
+                System.out.println("Successful Game query\n");
+                return game;
+            } catch (SQLException e) {
+                System.out.println("Unsuccessful Game query");
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        return null; //temp
+    }
+
+
+    @Override
+    public List <BaseModel> queryList(BaseModel obj, String filter)
+    {
         List <BaseModel> list = new ArrayList<>();
 
         StringBuilder qryBuilder = new StringBuilder();
@@ -235,28 +319,23 @@ public class DatabaseManager implements DataSource {
 
         if(obj instanceof User)
         {
-
-
-            qryBuilder.append("FROM User "
-                    +  "WHERE userID > 1 "
-                    +  "AND  status != 'INACTIVE' ");
+            qryBuilder.append("FROM User WHERE userID > 1 AND " +  filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
-
-                    User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"),
-                            rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
-                    list.add(user);
-
+                    User u = new User(rs.getString("userName"), rs.getString("password"),
+                            rs.getString("fName"), rs.getString("lName"),
+                            rs.getString("status"), rs.getString("UUID"),
+                            rs.getString("dateCreated"));
+                    list.add(u);
                 }
 
-                System.out.println("Got all QUERY \n\n");
-
+                System.out.println("Successful User list query\n");
             } catch (SQLException e) {
-                System.out.println("Error Get All Query");
+                System.out.println("Unsuccessful User list query");
                 e.printStackTrace();
             }
         }
@@ -318,116 +397,6 @@ public class DatabaseManager implements DataSource {
     }
 
 
-    @Override
-    public List<BaseModel> query(BaseModel obj, String filter) {
-
-        List <BaseModel> list = new ArrayList<>();
-        StringBuilder qryBuilder = new StringBuilder();
-        qryBuilder.append("SELECT ");
-
-        if(obj instanceof User)
-        {
-            qryBuilder.append("* " +
-                    "FROM User " +
-                    filter );
-
-            try {
-                ResultSet rs = executeQuery(qryBuilder.toString());
-
-                while(rs.next())
-                {
-                    User u = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"), rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
-                    list.add(u);
-                }
-
-                System.out.println("Got all QUERY \n\n");
-
-            } catch (SQLException e) {
-                System.out.println("Error Get All Query");
-                e.printStackTrace();
-                return null;
-            }
-
-        }
-        else if (obj instanceof Game)
-        {
-
-            qryBuilder.append("* " +
-                    "FROM Game " +
-                    filter);
-
-            /*
-                    @ To get a plyer's game history
-                    "WHERE p1Id = \'" +  playerID  + "\' "
-                   + OR p2Id = \'" +  playerID + "\' "
-
-                    @ To Get Active Games
-                    "WHERE endTime != NULL "
-                  + "ORDER BY id ASC "
-
-                    @ To Get Completed Games
-                    "WHERE endTime = NULL "
-                  + "ORDER BY id ASC "
-
-                    @ To See if Player is playing
-                     "WHERE p1Id = \'" +  playerID  + "\' "
-                   + "OR p2Id = \'" +  playerID + "\' "
-                   + "AND endTime != NULL "
-
-             */
-
-            try {
-                ResultSet rs = executeQuery(qryBuilder.toString());
-
-                while(rs.next())
-                {
-                    Game game = new Game((rs.getString("gameId")), rs.getString("startTime"),
-                            rs.getString("endTime"), (rs.getString("p1Id")),
-                            (rs.getString("p2Id")), (rs.getString("starterId")),
-                            (rs.getString("winnerId")));
-                    list.add(game);
-                }
-
-                System.out.println("Got all QUERY \n\n");
-
-            } catch (SQLException e) {
-                System.out.println("Error Get All Query");
-                e.printStackTrace();
-                return null;
-            }
-
-        }
-
-        return list;
-    }
-
-//
-//    @Override
-//    public BaseModel getUser(String userName)
-//    {
-//        StringBuilder qryBuilder = new StringBuilder();
-//        qryBuilder.append("SELECT ");
-//
-//            qryBuilder.append("* " + "FROM User " + "WHERE userName = \"" + userName + "\"");
-//
-//            try
-//            {
-//                ResultSet rs = executeQuery(qryBuilder.toString());
-//
-//                rs.next();
-//                User user = new User(rs.getString("userName"), rs.getString("password"), rs.getString("fName"), rs.getString("lName"), rs.getString("status"), rs.getString("UUID"), rs.getString("dateCreated"));
-//
-//                return user;
-//            }
-//            catch (SQLException e) {
-//                System.out.println("exception in getUser()");
-//                e.printStackTrace();
-//                return null;
-//            }
-//    }
-
-
-
     private void executeInsert(String query) throws SQLException {
 
         PreparedStatement pst = connection.prepareStatement(query);
@@ -443,6 +412,7 @@ public class DatabaseManager implements DataSource {
     }
 
     private void executeUpdate(String query) throws SQLException {
+
         PreparedStatement pst =  connection.prepareStatement(query);
         pst.executeUpdate();
 

@@ -11,6 +11,6 @@ public interface DataSource {
     BaseModel authenticate(String username, String password);
 //    BaseModel getUser(String userName);
 
-    List <BaseModel> list(BaseModel obj);
-    List <BaseModel> query(BaseModel obj, String filter);
+    List <BaseModel> queryList(BaseModel obj, String filter);
+    BaseModel query(BaseModel obj, String filter);
 }

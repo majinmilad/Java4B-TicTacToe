@@ -17,7 +17,7 @@
                </font>
             </Button>
             <ListView fx:id="gameList" layoutX="117.0" layoutY="66.0" prefHeight="280.0" prefWidth="466.0" />
-            <Button id="nextButtonLogin" fx:id="joinButton" layoutX="374.0" layoutY="355.0" mnemonicParsing="false" onAction="#joinButtonClicked" prefHeight="35.0" prefWidth="209.0" style="-fx-background-color: rgb(214, 214, 214);" text="Join">
+            <Button id="nextButtonLogin" fx:id="joinGameButton" layoutX="117.0" layoutY="354.0" mnemonicParsing="false" onAction="#joinGameButtonClicked" prefHeight="39.0" prefWidth="138.0" style="-fx-background-color: rgb(214, 214, 214);" text="Join">
                <font>
                   <Font size="18.0" />
                </font>
@@ -27,7 +27,12 @@
                   <Font size="36.0" />
                </font>
             </Label>
-            <Button id="nextButtonLogin" fx:id="createGameButton" layoutX="117.0" layoutY="355.0" mnemonicParsing="false" onAction="#createButtonClicked" prefHeight="35.0" prefWidth="193.0" style="-fx-background-color: rgb(214, 214, 214);" text="Create game">
+            <Button id="nextButtonLogin" fx:id="createGameButton" layoutX="281.0" layoutY="354.0" mnemonicParsing="false" onAction="#createGameButtonClicked" prefHeight="39.0" prefWidth="138.0" style="-fx-background-color: rgb(214, 214, 214);" text="Create game">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Button id="nextButtonLogin" fx:id="playLocallyButton" layoutX="445.0" layoutY="354.0" mnemonicParsing="false" onAction="#playLocallyButtonClicked" prefHeight="39.0" prefWidth="138.0" style="-fx-background-color: rgb(214, 214, 214);" text="Play locally">
                <font>
                   <Font size="18.0" />
                </font>

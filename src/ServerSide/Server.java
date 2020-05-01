@@ -1,6 +1,8 @@
 package ServerSide;
 
 import Messages.*;
+import javafx.scene.chart.XYChart;
+import modules.Game;
 import modules.User;
 import sqlite.DatabaseManager;
 
@@ -320,6 +322,30 @@ public class Server extends Observable implements Runnable
                         }
                         else
                             client.objectOutputToClient.writeBoolean(false);
+                        client.objectOutputToClient.flush();
+                    }
+                    else if(nextMsg instanceof NewGameMsg)
+                    {
+                        NewGameMsg newGameMsg = (NewGameMsg) nextMsg;
+                        Game newGame = new Game(newGameMsg.getCreator());
+
+                        //check if player has a game open
+                        User player1 = (User) DatabaseManager.getInstance().get(new User(client.clientsUserName));
+                        Object playerHasGameRunning = DatabaseManager.getInstance().query(newGame, "WHERE p1Id = \""
+                                                                + player1.getUserID() + "\" AND gameStatus = \"RUNNING\"");
+                        //if not make game
+                        if(playerHasGameRunning == null)
+                        {
+                            Object successfulInsert = DatabaseManager.getInstance().insert(newGame);
+                            if(successfulInsert != null)
+                            {
+                                GameCreatedMsg gameCreatedMsg = new GameCreatedMsg(newGame, client.clientsUserName);
+                                client.objectOutputToClient.writeObject(gameCreatedMsg);
+                            }
+                        }
+                        else //indicate game not made
+                            client.objectOutputToClient.writeObject(new UserHasGameOpenMsg());
+
                         client.objectOutputToClient.flush();
                     }
                 }

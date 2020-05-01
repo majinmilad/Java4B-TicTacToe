@@ -4,92 +4,98 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 public class Game extends BaseModel
 {
-    private String startTime;
-    private String endTime;
     private String p1Id;
     private String p2Id;
-    private String starterId;
+    private final String startTime;
+    private String endTime;
+    private String creatorId;
     private String winnerId;
-//    private final String gameId;
+    private final String gameId;
 
-    Game(String p1) {
-        startTime = "";
-        endTime   = "";
-        setP1Id(p1);
-        setStarterId(p1);
-
-    }
-
-    public Game(String gameId, String sTime, String eTime, String p1, String p2, String starter, String winner)
+    //create a brand new game
+    public Game(User player1)
     {
-        setId(gameId);
-        recallTimes(sTime,eTime);
-        setP1Id(p1);
-        setP2Id(p2);
-        setStarterId(starter);
-        setWinnerId(winner);
+        p1Id = player1.getUserID();
+        creatorId = player1.getUserID();
+        startTime = generateTime();
+        gameId = UUID.randomUUID().toString();
     }
 
-    public String getEndTime() {
-        return endTime;
+    //create a game and set all attributes
+    public Game(String p1Id, String p2Id, String sTime, String eTime, String gameCreatorId, String winnerId, String gameId)
+    {
+        this.p1Id = p1Id;
+        this.p2Id = p2Id;
+        startTime = sTime;
+        endTime = eTime;
+        creatorId = gameCreatorId;
+        this.winnerId = winnerId;
+        this.gameId = gameId;
     }
 
-    public void setEndTime() {
-        Date ended = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        endTime = dateFormat.format(ended);
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime() {
-        Date started = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        startTime = dateFormat.format(started);
-    }
-
+    // getters
     public String getP1Id() {
         return p1Id;
-    }
-
-    public void setP1Id(String p1Id) {
-        this.p1Id = p1Id;
     }
 
     public String getP2Id() {
         return p2Id;
     }
 
-    public void setP2Id(String p2Id) {
-        this.p2Id = p2Id;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public String getStarterId() {
-        return starterId;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public void setStarterId(String starterId) {
-        this.starterId = starterId;
+    public String getCreatorId() {
+        return creatorId;
     }
 
     public String getWinnerId() {
         return winnerId;
     }
 
+    public String getGameId() {
+        return gameId;
+    }
+
+    // setters
+    public void setP1Id(String p1Id) {
+        this.p1Id = p1Id;
+    }
+
+    public void setP2Id(String p2Id) {
+        this.p2Id = p2Id;
+    }
+
+    private void setEndTime() { endTime = generateTime(); }
+
     public void setWinnerId(String winnerId) {
         this.winnerId = winnerId;
     }
 
-    public void recallTimes(String sTime, String eTime)
-    {
-        startTime = sTime;
-        endTime   = eTime;
+    // helper methods
+    public String generateTime() {
+        Date ended = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(ended);
     }
 
-
+    public void displayAll()
+    {
+        System.out.println(p1Id);
+        System.out.println(p2Id);
+        System.out.println(startTime);
+        System.out.println(endTime);
+        System.out.println(creatorId);
+        System.out.println(winnerId);
+        System.out.println(gameId);
+    }
 }
