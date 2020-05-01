@@ -51,6 +51,7 @@ public class mainMenuWindowController {
     void pvcButtonClicked(ActionEvent event) throws IOException, ClassNotFoundException {
         // Create a game request for computer
         NewGameMsg newGameMsg = new NewGameMsg("COMPUTER", Global.CurrentAccount.getCurrentUser());
+        System.out.println("newGameMsg: " + newGameMsg.getGameType());
 
         //send game request to server
         Global.toServer.writeObject(newGameMsg);

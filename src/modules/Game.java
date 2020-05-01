@@ -36,6 +36,8 @@ public class Game extends BaseModel
         startTime = generateTime();
         gameId = UUID.randomUUID().toString();
         status = "RUNNING";
+
+        System.out.println("p2ID: " + p2Id + " startTime: " + startTime);
     }
 
     //create a game and set all attributes

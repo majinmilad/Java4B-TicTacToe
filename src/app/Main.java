@@ -23,7 +23,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception
     {
         //establish connection to the Server
-        Socket socket = new Socket("localhost", 7777);
+        Socket socket = new Socket("localhost", 8888);
 
         if(socket.isConnected()) {
             System.out.println("Connected to Server...\n");

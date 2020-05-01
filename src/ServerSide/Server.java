@@ -1,7 +1,6 @@
 package ServerSide;
 
 import Messages.*;
-import javafx.scene.chart.XYChart;
 import modules.Game;
 import modules.User;
 import sqlite.DatabaseManager;
@@ -25,7 +24,7 @@ public class Server extends Observable implements Runnable
     private static Server singletonRef = new Server();
 
     //the port this ServerManager is on
-    private final int serverPort = 7777;
+    private final int serverPort = 8888;
 
     //an ArrayList of the different ClientManagers connected to this server
     private HashMap<UUID, ClientConnection> clientMap = new HashMap<>();
@@ -328,23 +327,28 @@ public class Server extends Observable implements Runnable
                     {
                         NewGameMsg newGameMsg = (NewGameMsg) nextMsg;
                         Game newGame;
-                        if(newGameMsg.getGameType() == "COMPUTER" )
+                        if(newGameMsg.getGameType().equals("COMPUTER"))
                         {
                             newGame = new Game(newGameMsg.getCreator(), "computer");
+                            System.out.println("Created new Game w/ Computer");
                         }
-                        else if (newGameMsg.getGameType() == "LOCAL")
+                        else if (newGameMsg.getGameType().equals("LOCAL"))
                         {
                             newGame = new Game(newGameMsg.getCreator(), "local player");
+                            System.out.println("Created new Game w/ local");
                         }
                         else
                         {
                             newGame = new Game(newGameMsg.getCreator());
+                            System.out.println("Created new Game w/ Online");
                         }
 
                         //check if player has a game open
                         User player1 = (User) DatabaseManager.getInstance().get(new User(client.clientsUserName));
-                        Object playerHasGameRunning = DatabaseManager.getInstance().query(newGame, "WHERE p1Id = \""
-                                                                + player1.getUserID() + "\" AND gameStatus = \"RUNNING\"");
+                        Object playerHasGameRunning = DatabaseManager.getInstance().query(newGame,
+                                                            "WHERE p1Id = \"" + player1.getUserID() + "\""
+                                                                + "OR p2Id == \"" + player1.getUserID()
+                                                                + "\" AND gameStatus = \"RUNNING\" ");
                         //if not make game
                         if(playerHasGameRunning == null)
                         {
@@ -355,15 +359,14 @@ public class Server extends Observable implements Runnable
                                 client.objectOutputToClient.writeObject(gameCreatedMsg);
                             }
                         }
-                        else //indicate game not made
+                        else //indicate a game already exists
                             client.objectOutputToClient.writeObject(new UserHasGameOpenMsg());
-
-                        client.objectOutputToClient.flush();
+                            client.objectOutputToClient.flush();
                     }
-                    else if(nextMsg instanceof gameEndedMsg)
+                    else if(nextMsg instanceof GameEndedMsg)
                     {
-
-
+                        GameEndedMsg gameEndedMsg = (GameEndedMsg) nextMsg;
+                        DatabaseManager.getInstance().update(gameEndedMsg.getGameOver());
                     }
                 }
                 catch (InterruptedException | IOException e) {
