@@ -2,6 +2,7 @@ package ServerSide;
 
 import Messages.*;
 import modules.Game;
+import modules.GameViewers;
 import modules.User;
 import sqlite.DatabaseManager;
 
@@ -366,10 +367,21 @@ public class Server extends Observable implements Runnable
                     else if(nextMsg instanceof GameEndedMsg)
                     {
                         GameEndedMsg gameEndedMsg = (GameEndedMsg) nextMsg;
+                        // Notify DB needs updating
                         DatabaseManager.getInstance().update(gameEndedMsg.getGameOver());
+
+                        // Send to GUI Game Over + Result
+
                     }
                     else if(nextMsg instanceof ViewGameMsg)
                     {
+                        ViewGameMsg viewGameMsg = (ViewGameMsg) nextMsg;
+                        // Gets the Game Viewer Class w/ gameId + viewerId
+                        GameViewers newViewer = viewGameMsg.getNewViewer();
+                        // Adds Game Viewer Id into DB
+                        DatabaseManager.getInstance().insert(newViewer);
+
+                        // Add Viewer to a subsribed list
 
                     }
                 }

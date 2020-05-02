@@ -81,7 +81,7 @@ public class DatabaseManager implements DataSource {
             Moves m = (Moves) obj;
 
             qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time) " +
-                    "VALUES ( " + m.getGameId() +  ", " + m.getId() + ", " + m.getXcoord()
+                    "VALUES ( \'" + m.getGameId() +  "\', \'" + m.getId() + "\', " + m.getXcoord()
                     + ", " + m.getYcoord() + ", \'" + m.getTime() + "\')" );
         }
         else if(obj instanceof GameViewers)
@@ -89,7 +89,7 @@ public class DatabaseManager implements DataSource {
             GameViewers gv = (GameViewers) obj;
 
             qryBuilder.append("GameViewers (gameId,viewerId) " +
-                    "VALUES (" + gv.getId() + ", " + gv.getPlayerId() + ')');
+                    "VALUES (\'" + gv.getId() + "\', \'" + gv.getPlayerId() + "\')");
         }
 
         try {
