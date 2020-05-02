@@ -1,8 +1,9 @@
 package ServerSide;
 
 import Messages.*;
-import javafx.scene.chart.XYChart;
+import modules.BaseModel;
 import modules.Game;
+import modules.GameInfo;
 import modules.User;
 import sqlite.DatabaseManager;
 
@@ -11,9 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Observable;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Server extends Observable implements Runnable
@@ -117,7 +116,7 @@ public class Server extends Observable implements Runnable
                 while(true)
                 {
                     Message incomingMsg = (Message) objectInputFromClient.readObject();
-                    incomingMsg.setConnectionID(connectionID);
+                    incomingMsg.setConnectionID(connectionID); //to id which socket stream this msg came from
                     msgQueue.add(incomingMsg);
                 }
             }
@@ -326,27 +325,82 @@ public class Server extends Observable implements Runnable
                     }
                     else if(nextMsg instanceof NewGameMsg)
                     {
+                        //NOTE: BASED ON PLAYER2ID INSIDE NEWGAMEMSG WELL HANDLE PVP OR PVC
                         NewGameMsg newGameMsg = (NewGameMsg) nextMsg;
-                        Game newGame = new Game(newGameMsg.getCreator());
+                        Game newGame = new Game(newGameMsg.getCreator(), newGameMsg.getPlayer2Id());
 
                         //check if player has a game open
                         User player1 = (User) DatabaseManager.getInstance().get(new User(client.clientsUserName));
-                        Object playerHasGameRunning = DatabaseManager.getInstance().query(newGame, "WHERE p1Id = \""
-                                                                + player1.getUserID() + "\" AND gameStatus = \"RUNNING\"");
-                        //if not make game
-                        if(playerHasGameRunning == null)
+                        Object playerHasGameAlready = DatabaseManager.getInstance().query(newGame, "WHERE p1Id = \""
+                                                                + player1.getUserID() + "\" AND (gameStatus = \"RUNNING\" OR gameStatus = \"WAITING\")");
+
+                        if(playerHasGameAlready == null) //player is involved in no games
                         {
-                            Object successfulInsert = DatabaseManager.getInstance().insert(newGame);
-                            if(successfulInsert != null)
+                            if(!newGameMsg.getPlayer2Id().equals("1")) // PvP game
                             {
-                                GameCreatedMsg gameCreatedMsg = new GameCreatedMsg(newGame, client.clientsUserName);
-                                client.objectOutputToClient.writeObject(gameCreatedMsg);
+                                //create the requested game
+                                Object successfulInsert = DatabaseManager.getInstance().insert(newGame);
+                                if(successfulInsert != null)
+                                {
+                                    GameCreatedMsg gameCreatedMsg = new GameCreatedMsg(newGame, client.clientsUserName);
+                                    client.objectOutputToClient.writeObject(gameCreatedMsg);
+                                }
+                            }
+                            else //PvC game
+                            {
+                                //set up player vs computer game
                             }
                         }
                         else //indicate game not made
                             client.objectOutputToClient.writeObject(new UserHasGameOpenMsg());
 
                         client.objectOutputToClient.flush();
+                    }
+                    else if(nextMsg instanceof RequestForGamesMsg)
+                    {
+                        RequestForGamesMsg requestGamesMsg = (RequestForGamesMsg) nextMsg;
+
+                        List<BaseModel> gameList;
+
+                        if(requestGamesMsg.getGameStatusFilter() == null)
+                        {
+                            gameList = DatabaseManager.getInstance().queryList(new Game(), "");
+                        }
+                        else
+                        {
+                            gameList = DatabaseManager.getInstance().queryList(new Game(), "AND gameStatus = \'" + requestGamesMsg.getGameStatusFilter() + "\'");
+                        }
+
+                        //convert list of games into list of gameInfo objects
+                        List<GameInfo> gameInfoList = new ArrayList<>();
+
+                        for(BaseModel g : gameList)
+                        {
+                            Game game = (Game) g;
+                            GameInfo gameInfo = new GameInfo();
+                            gameInfo.setGame(game);
+
+                            //set usernames
+                            String userName = ((User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + game.getP1Id() +"\'")).getUsername();
+                            gameInfo.setPlayer1Username(userName);
+                            User player2 = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + game.getP2Id() +"\'");
+                            if(player2 != null)
+                                gameInfo.setPlayer2Username(player2.getUsername());
+
+                            gameInfoList.add(gameInfo);
+                        }
+
+                        //send gameListMsg back to client
+                        GameListMsg gameListMsg = new GameListMsg(gameInfoList);
+                        client.objectOutputToClient.writeObject(gameListMsg);
+                        client.objectOutputToClient.flush();
+                    }
+                    else if(nextMsg instanceof UserLeftLobbyMsg)
+                    {
+                        User userThatLeft = ((UserLeftLobbyMsg) nextMsg).getUser();
+                        Object game = DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + userThatLeft.getUserID() + "\' AND gameStatus = \'WAITING\'");
+                        if(game != null)
+                            DatabaseManager.getInstance().delete((Game) game);
                     }
                 }
                 catch (InterruptedException | IOException e) {
@@ -358,7 +412,7 @@ public class Server extends Observable implements Runnable
     }
 
 
-    void sendToServerGUI(Object obj)
+    private void sendToServerGUI(Object obj)
     {
         setChanged();
         notifyObservers(obj);

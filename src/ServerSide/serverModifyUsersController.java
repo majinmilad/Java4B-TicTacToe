@@ -50,11 +50,11 @@ public class serverModifyUsersController implements Initializable {
         }
     }
 
-    void populateUserList()
+    private void populateUserList()
     {
         usersList.getItems().clear();
 
-        List<BaseModel> list = DatabaseManager.getInstance().queryList(new User(), "status != 'INACTIVE'");
+        List<BaseModel> list = DatabaseManager.getInstance().queryList(new User(), "AND status != 'INACTIVE'");
 
         for (BaseModel u : list)
         {

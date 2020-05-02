@@ -10,18 +10,18 @@ public class Game extends BaseModel
 {
     private String p1Id;
     private String p2Id;
-    private final String startTime;
+    private String startTime;
     private String endTime;
     private String creatorId;
     private String winnerId;
     private final String gameId;
 
     //create a brand new game
-    public Game(User player1)
+    public Game(User player1, String player2Id)
     {
         p1Id = player1.getUserID();
+        p2Id = player2Id;
         creatorId = player1.getUserID();
-        startTime = generateTime();
         gameId = UUID.randomUUID().toString();
     }
 
@@ -35,6 +35,12 @@ public class Game extends BaseModel
         creatorId = gameCreatorId;
         this.winnerId = winnerId;
         this.gameId = gameId;
+    }
+
+    //constructor for dummy instances
+    public Game()
+    {
+        gameId = null;
     }
 
     // getters
@@ -82,10 +88,11 @@ public class Game extends BaseModel
     }
 
     // helper methods
-    public String generateTime() {
-        Date ended = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.format(ended);
+    public String generateTime()
+    {
+        Date time = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return dateFormat.format(time);
     }
 
     public void displayAll()

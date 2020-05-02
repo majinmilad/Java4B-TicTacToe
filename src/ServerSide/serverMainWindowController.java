@@ -62,7 +62,7 @@ public class serverMainWindowController implements Observer, Initializable {
     {
         onlineUserBox.clear();
 
-        List<BaseModel> list = DatabaseManager.getInstance().queryList(new User(), "status = 'ONLINE'");
+        List<BaseModel> list = DatabaseManager.getInstance().queryList(new User(), "AND status = 'ONLINE'");
 
         for (BaseModel u : list)
         {

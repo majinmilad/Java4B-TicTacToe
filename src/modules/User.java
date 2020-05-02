@@ -23,8 +23,8 @@ public class User extends BaseModel
 
     public User(String username)
     {
-        userUUID = "";
         this.username = username;
+        userUUID = "";
     }
 
     public User(String username, String password, String firstName, String lastName)
@@ -75,7 +75,6 @@ public class User extends BaseModel
         Date creation = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         created = dateFormat.format(creation);
-        System.out.println(dateFormat.format(creation));
     }
 
     public void setCreated(String s)

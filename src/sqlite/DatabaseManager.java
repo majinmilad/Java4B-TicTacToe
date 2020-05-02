@@ -73,8 +73,8 @@ public class DatabaseManager implements DataSource {
         {
             Game g = (Game) obj;
 
-            qryBuilder.append("Game (p1Id, startTime, creatorId, gameStatus, UUID) " +
-                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getStartTime() + "\', \'" + g.getCreatorId() + "\', \'RUNNING\', \'" + g.getGameId() + "\')");
+            qryBuilder.append("Game (p1Id, p2Id, creatorId, gameStatus, UUID) " +
+                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getP2Id() + "\', \'" + g.getCreatorId() + "\', \'WAITING\', \'" + g.getGameId() + "\')");
         }
         else if(obj instanceof Moves)
         {
@@ -137,15 +137,20 @@ public class DatabaseManager implements DataSource {
     public BaseModel delete(BaseModel obj)
     {
         StringBuilder qryBuilder = new StringBuilder();
-        qryBuilder.append("UPDATE ");
 
         if(obj instanceof User)
         {
             User u = (User) obj;
 
-            qryBuilder.append("User " +
+            qryBuilder.append("UPDATE User " +
                     "SET status = 'INACTIVE' " +
                     "WHERE UUID = \'" + u.getUserID() + "\'");
+        }
+        else if(obj instanceof Game)
+        {
+            Game g = (Game) obj;
+
+            qryBuilder.append("DELETE FROM Game WHERE UUID = \'" + g.getGameId() + "\'");
         }
 
         try {
@@ -319,7 +324,7 @@ public class DatabaseManager implements DataSource {
 
         if(obj instanceof User)
         {
-            qryBuilder.append("FROM User WHERE userID > 1 AND " +  filter);
+            qryBuilder.append("FROM User WHERE userID > 1 " +  filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
@@ -339,14 +344,29 @@ public class DatabaseManager implements DataSource {
                 e.printStackTrace();
             }
         }
-//        else if (obj instanceof Game)
-//        {
-//            Game game = (Game) obj;
-//
-//            qryBuilder.append("FROM Game "
-//                            +  "WHERE playerId = \'" + game.get() + "\' "
-//                            +  "AND  status != 'INACTIVE' ");
-//        }
+        else if (obj instanceof Game)
+        {
+            qryBuilder.append("FROM Game WHERE p2Id != 1 " + filter);
+
+            try {
+                ResultSet rs = executeQuery(qryBuilder.toString());
+
+                while(rs.next())
+                {
+                    Game g = new Game(rs.getString("p1Id"), rs.getString("p2Id"),
+                            rs.getString("startTime"), rs.getString("endTime"),
+                            rs.getString("creatorId"), rs.getString("winnerId"),
+                            rs.getString("UUID"));
+
+                    list.add(g);
+                }
+
+                System.out.println("Successful Game list query\n");
+            } catch (SQLException e) {
+                System.out.println("Unsuccessful Game list query");
+                e.printStackTrace();
+            }
+        }
         else if (obj instanceof Moves)
         {
             Moves moves = (Moves) obj;

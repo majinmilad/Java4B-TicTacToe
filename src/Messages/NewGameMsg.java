@@ -5,22 +5,18 @@ import modules.User;
 public class NewGameMsg extends Message
 {
     private final User player1; //game creator
-    private final String gameType;
+    private final String player2Id; //null for PvP or 1 for PvC
 
-    //game type options
-    // "LOCAL" - player v. player locally
-    // "REMOTE" - player v. player remotely
-    // "COMPUTER" - player v. computer
-
-    public NewGameMsg(String gameType, User gameCreator)
+    public NewGameMsg(User gameCreator, String player2Id)
     {
         super("NewGameMsg", "");
 
-        this.gameType = gameType;
         player1 = gameCreator;
+        this.player2Id = player2Id;
     }
 
     public User getCreator() {
         return player1;
     }
+    public String getPlayer2Id() { return player2Id; }
 }
