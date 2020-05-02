@@ -73,8 +73,8 @@ public class DatabaseManager implements DataSource {
         {
             Game g = (Game) obj;
 
-            qryBuilder.append("Game (p1Id, p2Id, startTime, creatorId, gameStatus, UUID) " +
-                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getP2Id() + "\', \'"  + g.getStartTime() + "\', \'" + g.getCreatorId() + "\', \'"+ g.getStatus() + "\', \'" + g.getGameId() + "\')");
+            qryBuilder.append("Game (p1Id, p2Id, creatorId, gameStatus, UUID) " +
+                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getP2Id() + "\', \'"  + g.getCreatorId() + "\', \'"+ g.getStatus() + "\', \'" + g.getGameId() + "\')");
         }
         else if(obj instanceof Moves)
         {
@@ -121,13 +121,14 @@ public class DatabaseManager implements DataSource {
                     "WHERE UUID = \'" + u.getUserID() + "\'");
 
         }
-        else if (obj instanceof User)
+        else if (obj instanceof Game)
         {
             Game g = (Game) obj;
 
             qryBuilder.append("Game "+
-                              "SET winnerId = \'" + g.getWinnerId() + "\', endTime = \'" + g.getEndTime() +"\', gameStatus = \'" + g.getStatus() + "\' ");
-            }
+                              "SET startTime = \'"+ g.getStartTime() + "\',  p2Id = \'" + g.getP2Id() +"\', winnerId = \'" + g.getWinnerId() + "\', " +
+                              "endTime = \'" + g.getEndTime() +"\', gameStatus = \'" + g.getStatus() + "\' ");
+        }
 
         try {
             executeUpdate(qryBuilder.toString());

@@ -368,6 +368,10 @@ public class Server extends Observable implements Runnable
                         GameEndedMsg gameEndedMsg = (GameEndedMsg) nextMsg;
                         DatabaseManager.getInstance().update(gameEndedMsg.getGameOver());
                     }
+                    else if(nextMsg instanceof ViewGameMsg)
+                    {
+
+                    }
                 }
                 catch (InterruptedException | IOException e) {
                     System.out.println("exception caught in server Publisher's run()");
