@@ -370,7 +370,7 @@ public class Server extends Observable implements Runnable
                         // Notify DB needs updating
                         DatabaseManager.getInstance().update(gameEndedMsg.getGameOver());
 
-                        // Send to GUI Game Over + Result
+                        // Notify Observers that Game is Over
 
                     }
                     else if(nextMsg instanceof ViewGameMsg)
@@ -389,7 +389,7 @@ public class Server extends Observable implements Runnable
                             // Adds Game Viewer Id into DB
                             DatabaseManager.getInstance().insert(newViewer);
 
-                            // Add Viewer to a subscribed list
+                            // Add Viewer to a subscribed list (make observable)
                         }
                         else
                         {
