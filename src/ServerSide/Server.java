@@ -376,12 +376,27 @@ public class Server extends Observable implements Runnable
                     else if(nextMsg instanceof ViewGameMsg)
                     {
                         ViewGameMsg viewGameMsg = (ViewGameMsg) nextMsg;
-                        // Gets the Game Viewer Class w/ gameId + viewerId
-                        GameViewers newViewer = viewGameMsg.getNewViewer();
-                        // Adds Game Viewer Id into DB
-                        DatabaseManager.getInstance().insert(newViewer);
+                        Game findGame = new Game(viewGameMsg.getNewViewer().getId());
+                        Object liveGame = DatabaseManager.getInstance().query(findGame, "WHERE gameId = \'" + findGame.getGameId()
+                                                                                  + "\' "
+                                                                                  + "AND status != 'ENDED' " );
 
-                        // Add Viewer to a subsribed list
+                        // Game is still running
+                        if(liveGame != null)
+                        {
+                            // Gets the Game Viewer Class w/ gameId + viewerId
+                            GameViewers newViewer = viewGameMsg.getNewViewer();
+                            // Adds Game Viewer Id into DB
+                            DatabaseManager.getInstance().insert(newViewer);
+
+                            // Add Viewer to a subscribed list
+                        }
+                        else
+                        {
+                            // Notify that game has ended
+                        }
+
+
 
                     }
                 }

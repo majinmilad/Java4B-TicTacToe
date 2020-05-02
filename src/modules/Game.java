@@ -17,6 +17,13 @@ public class Game extends BaseModel
     private final String gameId;
     private String status;
 
+    // Container to find a game for ViewGameMsg
+    public Game(String gameId)
+    {
+        this.gameId = gameId;
+    }
+
+
     //create a brand new game
     public Game(User player1)
     {
