@@ -26,8 +26,9 @@ public class Server extends Observable implements Runnable
     //the port this ServerManager is on
     private final int serverPort = 7777;
 
-    //an ArrayList of the different ClientManagers connected to this server
-    private HashMap<UUID, ClientConnection> clientMap = new HashMap<>();
+    //a map of the different ClientConnections to this server
+    private HashMap<UUID, ClientConnection> clientMapConnectId = new HashMap<>();
+    private HashMap<String, ClientConnection> clientMapPlayerId = new HashMap<>(); //used in situations where player id is used to get socket connection
 
     //a blocking queue for messages to be processed
     private ArrayBlockingQueue<Message> msgQueue = new ArrayBlockingQueue<>(1000);
@@ -70,7 +71,7 @@ public class Server extends Observable implements Runnable
 
                     //create connection id and store connection
                     UUID connectID = UUID.randomUUID();
-                    clientMap.put(connectID, new ClientConnection(socket, connectID));
+                    clientMapConnectId.put(connectID, new ClientConnection(socket, connectID));
                 }
                 else
                     System.out.println("Server didn't connect !!!\n");
@@ -124,23 +125,36 @@ public class Server extends Observable implements Runnable
             {
                 if(e instanceof IOException) //client program disconnected
                 {
-                    //logoff the client
-                    User searchUser = new User(clientsUserName);
-                    User returnedUser = (User) DatabaseManager.getInstance().get(searchUser);
-                    if(returnedUser.getStatus().equals("ONLINE"))
-                    {
-                        returnedUser.setStatus("OFFLINE");
-                        DatabaseManager.getInstance().update(returnedUser);
-                        //send to server GUI
-                        sendToServerGUI(new LogoutMsg(returnedUser));
-                    }
-
-                    //remove their connection from map
-                    clientMap.remove(connectionID);
+                    //perform disconnection actions
+                    ClientHasDisconnected();
                 }
                 System.out.println("exception caught in one of server's ClientConnection object's run()");
                 e.printStackTrace();
             }
+        }
+
+        private void ClientHasDisconnected()
+        {
+            User searchUser = new User(clientsUserName);
+            User thisUser = (User) DatabaseManager.getInstance().get(searchUser);
+
+            //delete if user has WAITING game
+            Object game = DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + thisUser.getUserID() + "\' AND gameStatus = \'WAITING\'");
+            if(game != null)
+                DatabaseManager.getInstance().delete((Game) game);
+
+            //logoff the client
+            if(thisUser.getStatus().equals("ONLINE"))
+            {
+                thisUser.setStatus("OFFLINE");
+                DatabaseManager.getInstance().update(thisUser);
+                //send to server GUI
+                sendToServerGUI(new LogoutMsg(thisUser));
+            }
+
+            //remove their connection from map
+            clientMapConnectId.remove(connectionID);
+            clientMapPlayerId.remove(thisUser.getUserID());
         }
 
         void sendMessageFromPublisher(Message msg)
@@ -183,7 +197,7 @@ public class Server extends Observable implements Runnable
                     //pull message off queue
                     Message nextMsg = msgQueue.take();
 
-                    ClientConnection client = clientMap.get(nextMsg.getConnectionID());
+                    ClientConnection client = clientMapConnectId.get(nextMsg.getConnectionID());
 
                     //process the message
                     if(nextMsg instanceof RegistrationMsg)
@@ -200,12 +214,12 @@ public class Server extends Observable implements Runnable
                             Object successfulInsert = DatabaseManager.getInstance().insert(regMsg.getUser());
 
                             if(successfulInsert != null) {
-                                client.objectOutputToClient.writeBoolean(true);
                                 client.clientsUserName = regMsg.getUser().getUsername(); //update ClientConnection username attribute
                                 sendToServerGUI(regMsg); //send to server GUI
+                                client.objectOutputToClient.writeBoolean(true); //indicate successful registration
                             }
                             else
-                                client.objectOutputToClient.writeBoolean(false);
+                                client.objectOutputToClient.writeBoolean(false); //indicate unsuccessful registration
 
                             client.objectOutputToClient.flush();
                         }
@@ -253,6 +267,9 @@ public class Server extends Observable implements Runnable
                                 //update ClientConnection username attribute
                                 client.clientsUserName = user.getUsername();
 
+                                //update parallel connection map with player id
+                                clientMapPlayerId.put(returnedUser.getUserID(), client);
+
                                 //send message to server GUI
                                 sendToServerGUI(loginMsg);
                             }
@@ -278,7 +295,10 @@ public class Server extends Observable implements Runnable
                         Object returnStatus = DatabaseManager.getInstance().update(logoutMsg.getUser());
 
                         if(returnStatus != null)
+                        {
+                            clientMapPlayerId.remove(logoutMsg.getUser().getUserID(), client);
                             sendToServerGUI(logoutMsg);
+                        }
                     }
                     else if(nextMsg instanceof ReactivateUserMsg)
                     {
@@ -325,7 +345,6 @@ public class Server extends Observable implements Runnable
                     }
                     else if(nextMsg instanceof NewGameMsg)
                     {
-                        //NOTE: BASED ON PLAYER2ID INSIDE NEWGAMEMSG WELL HANDLE PVP OR PVC
                         NewGameMsg newGameMsg = (NewGameMsg) nextMsg;
                         Game newGame = new Game(newGameMsg.getCreator(), newGameMsg.getPlayer2Id());
 
@@ -336,7 +355,7 @@ public class Server extends Observable implements Runnable
 
                         if(playerHasGameAlready == null) //player is involved in no games
                         {
-                            if(!newGameMsg.getPlayer2Id().equals("1")) // PvP game
+                            if(newGameMsg.getPlayer2Id() == null) // new PvP game
                             {
                                 //create the requested game
                                 Object successfulInsert = DatabaseManager.getInstance().insert(newGame);
@@ -346,7 +365,7 @@ public class Server extends Observable implements Runnable
                                     client.objectOutputToClient.writeObject(gameCreatedMsg);
                                 }
                             }
-                            else //PvC game
+                            else if(newGameMsg.getPlayer2Id().equals("1")) // new PvC game
                             {
                                 //set up player vs computer game
                             }
@@ -380,7 +399,7 @@ public class Server extends Observable implements Runnable
                             GameInfo gameInfo = new GameInfo();
                             gameInfo.setGame(game);
 
-                            //set usernames
+                            //set usernames involved in game
                             String userName = ((User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + game.getP1Id() +"\'")).getUsername();
                             gameInfo.setPlayer1Username(userName);
                             User player2 = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + game.getP2Id() +"\'");
@@ -401,6 +420,32 @@ public class Server extends Observable implements Runnable
                         Object game = DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + userThatLeft.getUserID() + "\' AND gameStatus = \'WAITING\'");
                         if(game != null)
                             DatabaseManager.getInstance().delete((Game) game);
+                    }
+                    else if(nextMsg instanceof JoinGameRequestMsg)
+                    {
+                        JoinGameRequestMsg joinGameMsg = (JoinGameRequestMsg) nextMsg;
+
+                        //check if game still in WAITING mode
+                        Object game = DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + joinGameMsg.getGameInfo().getGame().getP1Id() + "\' AND gameStatus = \'WAITING\'");
+                        if(game != null)
+                        {
+                            User gameCreator = (User) DatabaseManager.getInstance().get(new User(joinGameMsg.getGameInfo().getPlayer1Username()));
+
+                            GameStartingMsg gameStartingMsg = new GameStartingMsg(joinGameMsg.getGameInfo(), gameCreator, joinGameMsg.getRequestingUser());
+
+                            //send to game creator
+                            clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.writeObject(gameStartingMsg);
+                            clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.flush();
+
+                            //send to second player
+                            client.objectOutputToClient.writeObject(gameStartingMsg);
+                            client.objectOutputToClient.flush();
+                        }
+                    }
+                    else if(nextMsg instanceof KillListenerMsg)
+                    {
+                        client.objectOutputToClient.writeObject(nextMsg);
+                        client.objectOutputToClient.flush();
                     }
                 }
                 catch (InterruptedException | IOException e) {

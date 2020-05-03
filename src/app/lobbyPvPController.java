@@ -13,8 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import modules.BaseModel;
-import modules.Game;
 import modules.GameInfo;
 
 import java.io.IOException;
@@ -24,7 +22,7 @@ import java.util.ResourceBundle;
 public class lobbyPvPController implements Initializable {
 
     @FXML
-    private ListView<String> gameList;
+    private ListView<GameInList> gameList;
 
     @FXML
     private Button joinGameButton;
@@ -37,6 +35,8 @@ public class lobbyPvPController implements Initializable {
 
     @FXML
     private Button backButton;
+
+    ListeningClass listener;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
@@ -52,42 +52,36 @@ public class lobbyPvPController implements Initializable {
 
             for (GameInfo gameInfo : gameListMsg.getGameList())
             {
-                gameList.getItems().add("Host: " + gameInfo.getPlayer1Username() + " (waiting for opponent)...");
+                GameInList g = new GameInList();
+                g.setGameInfo(gameInfo);
+                gameList.getItems().add(g);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
 
-//        new Thread(new ListeningClass()).start();
+        listener = new ListeningClass();
+        listener.start();
     }
 
     @FXML
-    void joinGameButtonClicked(ActionEvent event) {
+    void joinGameButtonClicked(ActionEvent event) throws IOException
+    {
+        GameInfo gameSelected = gameList.getSelectionModel().getSelectedItem().getGameInfo();
 
+        //send join a game request to server
+        Global.toServer.writeObject(new JoinGameRequestMsg(gameSelected, Global.CurrentAccount.getCurrentUser()));
+        Global.toServer.flush();
     }
 
     @FXML
-    void createGameButtonClicked(ActionEvent event) throws IOException, ClassNotFoundException
+    void createGameButtonClicked(ActionEvent event) throws IOException
     {
         NewGameMsg newGameMsg = new NewGameMsg(Global.CurrentAccount.getCurrentUser(), null);
 
-        //send game request to server
+        //send game creation request to server
         Global.toServer.writeObject(newGameMsg);
         Global.toServer.flush();
-
-        //receive response from server
-        Object response = Global.fromServer.readObject();
-
-        if(response instanceof GameCreatedMsg)
-        {
-            //add game to lobby
-            GameCreatedMsg gameCreatedMsg = (GameCreatedMsg) response;
-            gameList.getItems().add("Host: " + gameCreatedMsg.getCreatorUsername() + " (waiting for opponent)...");
-        }
-        else if(response instanceof UserHasGameOpenMsg)
-        {
-            //display message
-        }
     }
 
     @FXML
@@ -111,6 +105,10 @@ public class lobbyPvPController implements Initializable {
     @FXML
     void backButtonClicked(ActionEvent event) throws IOException
     {
+        //shutdown listener
+        Global.toServer.writeObject(new KillListenerMsg("from lobbyPvPController"));
+
+        //notify that user left lobby
         Global.toServer.writeObject(new UserLeftLobbyMsg(Global.CurrentAccount.getCurrentUser()));
         Global.toServer.flush();
 
@@ -121,37 +119,90 @@ public class lobbyPvPController implements Initializable {
         window.show();
     }
 
+    /**************************************************************************************************/
+
+    class GameInList
+    {
+        //class used to store games in ListView while printing a specific string via toString()
+        private GameInfo gameInfo;
+        @Override
+        public String toString()
+        {
+            return "Host: " + gameInfo.getPlayer1Username() + " (waiting for opponent)...";
+        }
+        GameInfo getGameInfo() {
+            return gameInfo;
+        }
+        void setGameInfo(GameInfo gameInfo) {
+            this.gameInfo = gameInfo;
+        }
+    }
+
     // LISTENING THREAD
     class ListeningClass implements Runnable
     {
+        Thread thread;
+        boolean keepRunning;
+
+        public void start()
+        {
+            keepRunning = true;
+            thread = new Thread(this);
+            thread.start();
+        }
+
+        public void setStopSignal()
+        {
+            keepRunning = false;
+        }
+
         @Override
         public void run() //this thread's run()
         {
-            while(true)
+            while(keepRunning)
             {
                 try
                 {
                     //receive msg from server
                     Object serverMsg = Global.fromServer.readObject();
 
-                    //perform action on FX application thread
-                    Platform.runLater(new Runnable()
+                    if(serverMsg instanceof KillListenerMsg)
                     {
-                        @Override
-                        public void run()
+                        setStopSignal();
+                    }
+                    else
+                    {
+                        //perform action on FX application thread
+                        Platform.runLater(new Runnable()
                         {
-                            if(serverMsg instanceof GameCreatedMsg)
+                            @Override
+                            public void run()
                             {
-                                //add game to lobby
-                                GameCreatedMsg gameCreatedMsg = (GameCreatedMsg) serverMsg;
-                                gameList.getItems().add("Host: " + gameCreatedMsg.getCreatorUsername() + " (waiting for opponent)...");
+                                if(serverMsg instanceof GameCreatedMsg)
+                                {
+                                    GameCreatedMsg gameCreatedMsg = (GameCreatedMsg) serverMsg;
+
+                                    //add game to lobby
+                                    GameInfo gameInfo = new GameInfo();
+                                    gameInfo.setGame(gameCreatedMsg.getGame());
+                                    gameInfo.setPlayer1Username(Global.CurrentAccount.getCurrentUser().getUsername());
+
+                                    GameInList g = new GameInList();
+                                    g.setGameInfo(gameInfo);
+                                    gameList.getItems().add(g);
+                                }
+                                else if(serverMsg instanceof UserHasGameOpenMsg)
+                                {
+                                    //display a message
+                                }
+                                else if(serverMsg instanceof GameStartingMsg)
+                                {
+                                    //open game
+                                    System.out.println("game has been opened for " + Global.CurrentAccount.getCurrentUser().getUsername()+"!!!\n");
+                                }
                             }
-                            else if(serverMsg instanceof UserHasGameOpenMsg)
-                            {
-                                //display message
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
                 catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();

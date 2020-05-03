@@ -1,5 +1,6 @@
 package app;
 
+import Messages.KillListenerMsg;
 import Messages.LogoutMsg;
 import TicTacToe.gameWindowController;
 import javafx.event.ActionEvent;
@@ -39,6 +40,18 @@ public class mainMenuWindowController {
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(playerLobbyScene);
         window.show();
+
+        //shutdown Server upon exiting the window
+        window.setOnCloseRequest(anonymF ->
+        {
+            try {
+                //stop the controller's listener
+                Global.toServer.writeObject(new KillListenerMsg("for the PvP controller exit"));
+                Global.toServer.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @FXML

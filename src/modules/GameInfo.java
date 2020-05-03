@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class GameInfo implements Serializable
 {
+    //class used to move extra game information around
+
     private Game game;
     private String player1Username;
     private String player2Username;

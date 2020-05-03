@@ -22,6 +22,7 @@ public class ServerMain extends Application
         primaryStage.setOnCloseRequest(anonymF ->
         {
             //figure out a way to shutdown the server when server GUI is closed
+            //turn off server threads
         });
     }
 

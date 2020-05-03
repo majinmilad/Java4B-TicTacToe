@@ -7,13 +7,6 @@ public class GameCreatedMsg extends Message
 {
     private final Game theGame;
     private final String creatorUsername;
-//    private final User player1; //game creator
-//    private final String gameType;
-
-    //game type options
-    // "LOCAL" - player v. player locally
-    // "REMOTE" - player v. player remotely
-    // "COMPUTER" - player v. computer
 
     public GameCreatedMsg(Game createdGame, String creatorUsername)
     {
