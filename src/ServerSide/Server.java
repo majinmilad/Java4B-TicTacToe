@@ -357,6 +357,7 @@ public class Server extends Observable implements Runnable
                         {
                             if(newGameMsg.getPlayer2Id() == null) // new PvP game
                             {
+                                newGame.setStatus("WAITING");
                                 //create the requested game
                                 Object successfulInsert = DatabaseManager.getInstance().insert(newGame);
                                 if(successfulInsert != null)
@@ -368,6 +369,7 @@ public class Server extends Observable implements Runnable
                             else if(newGameMsg.getPlayer2Id().equals("1")) // new PvC game
                             {
                                 //set up player vs computer game
+                                newGame.setStatus("RUNNING");
                             }
                         }
                         else //indicate game not made

@@ -2,7 +2,6 @@ package modules;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -14,6 +13,7 @@ public class Game extends BaseModel
     private String endTime;
     private String creatorId;
     private String winnerId;
+    private String status;
     private final String gameId;
 
     //create a brand new game
@@ -87,6 +87,8 @@ public class Game extends BaseModel
         this.winnerId = winnerId;
     }
 
+    public void setStatus(String status){this.status = status;}
+
     // helper methods
     public String generateTime()
     {
@@ -104,5 +106,9 @@ public class Game extends BaseModel
         System.out.println(creatorId);
         System.out.println(winnerId);
         System.out.println(gameId);
+    }
+
+    public String getStatus() {
+        return status;
     }
 }
