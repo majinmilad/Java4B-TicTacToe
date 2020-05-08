@@ -370,8 +370,12 @@ public class Server extends Observable implements Runnable
                             {
                                 //set up player vs computer game
                                 newGame.setStatus("RUNNING");
-                                GameCreatedMsg compGame = new GameCreatedMsg(newGame, client.clientsUserName);
-                                client.objectOutputToClient.writeObject(compGame);
+                                Object successfulInsert = DatabaseManager.getInstance().insert(newGame);
+                                if(successfulInsert != null)
+                                {
+                                    GameCreatedMsg compGame = new GameCreatedMsg(newGame, client.clientsUserName);
+                                    client.objectOutputToClient.writeObject(compGame);
+                                }
                             }
                         }
                         else //indicate game not made
