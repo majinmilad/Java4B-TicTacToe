@@ -341,12 +341,11 @@ public class gameWindowController implements Initializable {
         }
         else if(gameBoard.isDisable() == false && turn > 9)
         {
-            turnPrompt.setText("Tie Game!");
             tieScore++;
             scoreTie.setText(Integer.toString(tieScore));
             disableBoard();
-            turn = 1;
             isFirstPlayer = true;
+            turnPrompt.setText("Tie Game!");
         }
     }
 
@@ -396,7 +395,6 @@ public class gameWindowController implements Initializable {
         buttons.forEach(btn -> {
             btn.getStyleClass().add("tie");
             turnPrompt.setText(p1Turn);
-            turn = 1;
             isFirstPlayer = true;
         });
 

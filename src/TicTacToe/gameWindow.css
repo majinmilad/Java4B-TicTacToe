@@ -8,16 +8,16 @@
     linear-gradient(#20262b, #191d22),
     radial-gradient(center 50.0% 0.0%, radius 100.0%, rgba(114.0,131.0,148.0,0.9), rgba(255.0,255.0,255.0,0.0));
     -fx-background-radius: 5.0,4.0,3.0,5.0;
-    -fx-background-insets: 0.0,-1.0,-2.0,0.0;
+    -fx-background-insets: 0.0,-3.0,-2.0,0.0;
     -fx-effect: dropshadow( three-pass-box , rgba(0.0,0.0,0.0,0.7) , 5.0, 0.0 , 0.0 , 1.0 );
     -fx-font-family: "Arial";
-    -fx-padding: 10.0 20.0 10.0 20.0;
+    -fx-padding: 10.0 10.0 10.0 10.0;
     -fx-font-weight: bold;
 
     -fx-padding:15px 20px;
     -fx-font-size: 25;
     -fx-text-alignment: center;
-    -fx-border-width: 0 px;
+    -fx-border-color: transparent;
     -fx-padding:1em 2em 1.5em 2em;
 
 }
@@ -71,4 +71,8 @@
 .tie{
     -fx-opacity: .65;
     -fx-effect: dropshadow( three-pass-box , rgba(0.0,0.0,0.0,0.7) , 5.0, 0.0 , 0.0 , 1.0 );
+}
+
+.grid{
+    -fx-border-color: transparent;
 }
