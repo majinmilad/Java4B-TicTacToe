@@ -1,10 +1,7 @@
 package ServerSide;
 
 import Messages.*;
-import modules.BaseModel;
-import modules.Game;
-import modules.GameInfo;
-import modules.User;
+import modules.*;
 import sqlite.DatabaseManager;
 
 import java.io.IOException;
@@ -454,6 +451,31 @@ public class Server extends Observable implements Runnable
                     {
                         client.objectOutputToClient.writeObject(nextMsg);
                         client.objectOutputToClient.flush();
+                    }
+                    else if(nextMsg instanceof ViewGameMsg)
+                    {
+
+                        ViewGameMsg viewGameMsg = (ViewGameMsg) nextMsg;
+                        Object liveGame = DatabaseManager.getInstance().query(new Game(), "WHERE gameId = \'" + viewGameMsg.getNewViewer().getId()
+                                + "\' "
+                                + "AND status != 'ENDED' " );
+
+                        // Game is still running
+                        if(liveGame != null)
+                        {
+                            // Gets the Game Viewer Class w/ gameId + viewerId
+                            GameViewers newViewer = viewGameMsg.getNewViewer();
+                            // Adds Game Viewer Id into DB
+                            DatabaseManager.getInstance().insert(newViewer);
+
+                            // Add Viewer to a subscribed list (make observable)
+                        }
+                        else
+                        {
+                            // Notify that game has ended
+                        }
+
+
                     }
                 }
                 catch (InterruptedException | IOException e) {
