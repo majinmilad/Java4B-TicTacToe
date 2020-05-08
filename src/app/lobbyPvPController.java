@@ -10,13 +10,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import modules.GameInfo;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class lobbyPvPController implements Initializable {
@@ -194,6 +197,10 @@ public class lobbyPvPController implements Initializable {
                                 else if(serverMsg instanceof UserHasGameOpenMsg)
                                 {
                                     //display a message
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
+                                    alert.setTitle("Game in Progress");
+                                    alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
+                                    Optional<ButtonType> buttonResult = alert.showAndWait();
                                 }
                                 else if(serverMsg instanceof GameStartingMsg)
                                 {
