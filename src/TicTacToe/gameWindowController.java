@@ -150,48 +150,56 @@ public class gameWindowController implements Initializable {
         //Row 1
         if ("" != b1.getText() && b1.getText() == b2.getText()
                 && b2.getText() == b3.getText()) {
+            disableBoard();
             highlightWinningCombo(b1, b2, b3);
             return true;
         }
         //Row 2
         if ("" != b4.getText() && b4.getText() == b5.getText()
                 && b5.getText() == b6.getText()) {
+            disableBoard();
             highlightWinningCombo(b4, b5, b6);
             return true;
         }
         //Row 3
         if ("" != b7.getText() && b7.getText() == b8.getText()
                 && b8.getText() == b9.getText()) {
+            disableBoard();
             highlightWinningCombo(b7, b8, b9);
             return true;
         }
         //Column 1
         if ("" != b1.getText() && b1.getText() == b4.getText()
                 && b4.getText() == b7.getText()) {
+            disableBoard();
             highlightWinningCombo(b1, b4, b7);
             return true;
         }
         //Column 2
         if ("" != b2.getText() && b2.getText() == b5.getText()
                 && b5.getText() == b8.getText()) {
+            disableBoard();
             highlightWinningCombo(b2, b5, b8);
             return true;
         }
         //Column 3
         if ("" != b3.getText() && b3.getText() == b6.getText()
                 && b6.getText() == b9.getText()) {
+            disableBoard();
             highlightWinningCombo(b3, b6, b9);
             return true;
         }
         //Diagonal 1
         if ("" != b1.getText() && b1.getText() == b5.getText()
                 && b5.getText() == b9.getText()) {
+            disableBoard();
             highlightWinningCombo(b1, b5, b9);
             return true;
         }
         //Diagonal 2
         if ("" != b3.getText() && b3.getText() == b5.getText()
                 && b5.getText() == b7.getText()) {
+            disableBoard();
             highlightWinningCombo(b3, b5, b7);
             return true;
         }
@@ -212,9 +220,6 @@ public class gameWindowController implements Initializable {
 
     public void buttonClickHandler(ActionEvent evt)
     {
-
-
-
 
         String winner;
 
@@ -316,7 +321,8 @@ public class gameWindowController implements Initializable {
         boolean result;
         result = find3InARow();
 
-        if (result == true) {
+        if (result == true)
+        {
             if(!isFirstPlayer)
             {
                 winner = player1Name.getText() + ' ';
@@ -338,7 +344,7 @@ public class gameWindowController implements Initializable {
             turnPrompt.setText("Tie Game!");
             tieScore++;
             scoreTie.setText(Integer.toString(tieScore));
-            gameBoard.setDisable(true);
+            disableBoard();
             turn = 1;
             isFirstPlayer = true;
         }
@@ -359,6 +365,7 @@ public class gameWindowController implements Initializable {
                 ((Button) btn).setText("");
                 stopFadeTransition((Button) btn);
                 btn.getStyleClass().remove("winning-square");
+                btn.getStyleClass().remove("tie");
                 turnPrompt.setText(p1Turn);
                 turn = 1;
                 isFirstPlayer = true;
@@ -379,6 +386,20 @@ public class gameWindowController implements Initializable {
         menuWindow.show();
 
         resetScore();
+    }
+
+    public void disableBoard()
+    {
+        gameBoard.setDisable(true);
+        ObservableList<Node> buttons = gameBoard.getChildren();
+
+        buttons.forEach(btn -> {
+            btn.getStyleClass().add("tie");
+            turnPrompt.setText(p1Turn);
+            turn = 1;
+            isFirstPlayer = true;
+        });
+
     }
 }
 
