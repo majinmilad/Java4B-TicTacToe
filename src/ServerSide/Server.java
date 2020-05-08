@@ -468,7 +468,7 @@ public class Server extends Observable implements Runnable
                             // Adds Game Viewer Id into DB
                             DatabaseManager.getInstance().insert(newViewer);
 
-                            // Add Viewer to a subscribed list (make observable)
+                            // Add Viewer to Game & A Subscribed list?
                         }
                         else
                         {
