@@ -69,6 +69,43 @@ public class mainMenuWindowController {
         Stage boardWindow = new Stage();
         boardWindow.setScene(boardScene);
         boardWindow.show();
+
+        /*
+        // Create a game request for computer
+        NewGameMsg newGameMsg = new NewGameMsg(Global.CurrentAccount.getCurrentUser(), "1");
+
+        //send game request to server
+        Global.toServer.writeObject(newGameMsg);
+        Global.toServer.flush();
+
+        //receive response from server
+        Object response = Global.fromServer.readObject();
+
+        if(response instanceof GameCreatedMsg)
+        {
+            FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
+            Parent boardParent = loader.load();
+
+            gameWindowController setController = loader.getController();
+            setController.initializeName("Player 1", "Computer");
+
+            Scene boardScene = new Scene(boardParent, 950, 775);
+            boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+
+            Stage boardWindow = new Stage();
+            boardWindow.setScene(boardScene);
+            boardWindow.show();
+        }
+        else if(response instanceof UserHasGameOpenMsg)
+        {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
+            alert.setTitle("Game in Progress");
+            alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
+            Optional<ButtonType> buttonResult = alert.showAndWait();
+        }
+         */
+
+
     }
 
     @FXML
