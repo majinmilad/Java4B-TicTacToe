@@ -53,18 +53,26 @@ public class lobbyPvPController implements Initializable {
 
             GameListMsg gameListMsg = (GameListMsg) Global.fromServer.readObject();
 
-            for (GameInfo gameInfo : gameListMsg.getGameList())
+            System.out.println("read back from server");
+            if(gameListMsg == null)
+                System.out.println("is null");
+            else
+                System.out.println("not null");
+            if(gameListMsg != null)
             {
-                GameInList g = new GameInList();
-                g.setGameInfo(gameInfo);
-                gameList.getItems().add(g);
+                for (GameInfo gameInfo : gameListMsg.getGameList())
+                {
+                    GameInList g = new GameInList();
+                    g.setGameInfo(gameInfo);
+                    gameList.getItems().add(g);
+                }
             }
+
+            listener = new ListeningClass();
+            listener.start();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-        listener = new ListeningClass();
-        listener.start();
     }
 
     @FXML
@@ -98,11 +106,13 @@ public class lobbyPvPController implements Initializable {
         setController.initializeName("Player 1", "Player 2");
 
         //show the game window
-        Scene gameScene = new Scene(gameParent, 950, 775);
+        Scene gameScene = new Scene(gameParent, 800, 600);
         gameScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
         Stage gameStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         gameStage.setScene(gameScene);
         gameStage.show();
+
+        listener.setStopSignal();
     }
 
     @FXML
@@ -176,11 +186,6 @@ public class lobbyPvPController implements Initializable {
                     else
                     {
                         //perform action on FX application thread
-                        Platform.runLater(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
                                 if(serverMsg instanceof GameCreatedMsg)
                                 {
                                     GameCreatedMsg gameCreatedMsg = (GameCreatedMsg) serverMsg;
@@ -192,29 +197,67 @@ public class lobbyPvPController implements Initializable {
 
                                     GameInList g = new GameInList();
                                     g.setGameInfo(gameInfo);
-                                    gameList.getItems().add(g);
+
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            gameList.getItems().add(g);
+                                        }
+                                    });
                                 }
                                 else if(serverMsg instanceof UserHasGameOpenMsg)
                                 {
-                                    //display a message
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
-                                    alert.setTitle("Game in Progress");
-                                    alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
-                                    Optional<ButtonType> buttonResult = alert.showAndWait();
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //display a message
+                                            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
+                                            alert.setTitle("Game in Progress");
+                                            alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
+                                            Optional<ButtonType> buttonResult = alert.showAndWait();
+                                        }
+                                    });
                                 }
                                 else if(serverMsg instanceof GameStartingMsg)
                                 {
-                                    //open game
-                                    System.out.println("game has been opened for " + Global.CurrentAccount.getCurrentUser().getUsername()+"!!!\n");
+                                    System.out.println("before " + keepRunning);
+                                    setStopSignal();
+                                    System.out.println(keepRunning);
+
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //open game
+                                            try {
+                                                FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
+                                                Parent boardParent = loader.load();
+
+                                                gameWindowController setController = loader.getController();
+                                                setController.initializeName("Player 1", "Player 2");
+
+                                                Scene boardScene = new Scene(boardParent, 800, 600);
+                                                boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+
+                                                Stage boardWindow = (Stage) backButton.getScene().getWindow();;
+                                                boardWindow.setScene(boardScene);
+                                                boardWindow.show();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+
+                                    //System.out.println("game has been opened for " + Global.CurrentAccount.getCurrentUser().getUsername()+"!!!\n");
                                 }
-                            }
-                        });
+
+                        System.out.println("message processed in listener");
                     }
                 }
                 catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }
+            System.out.println("thread is stopped.");
         }
     }
 }

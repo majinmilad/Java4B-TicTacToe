@@ -18,7 +18,7 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:Database/TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
             // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\Java4B-TicTacToe\Database\TicTacToeDB.db
             // Phill: Database/TicTacToeDB.db
             // Kenny:
@@ -126,7 +126,7 @@ public class DatabaseManager implements DataSource {
 
             qryBuilder.append("Game "+
                     "SET startTime = \'"+ g.getStartTime() + "\',  p2Id = \'" + g.getP2Id() +"\', winnerId = \'" + g.getWinnerId() + "\', " +
-                    "endTime = \'" + g.getEndTime() +"\', gameStatus = \'" + g.getStatus() + "\' ");
+                    "endTime = \'" + g.getEndTime() +"\', gameStatus = \'" + g.getStatus() + "\' " + "WHERE UUID = \'" + g.getGameId() + "\'");
         }
 
 

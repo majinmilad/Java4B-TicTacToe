@@ -14,7 +14,7 @@
             <Font name="System Bold" size="26.0" />
          </font>
       </Label>
-      <Button fx:id="updateButton" layoutX="65.0" layoutY="541.0" mnemonicParsing="false" onAction="#updateButtonClicked" prefHeight="29.0" prefWidth="90.0" text="Update">
+      <Button fx:id="updateButton" layoutX="143.0" layoutY="541.0" mnemonicParsing="false" onAction="#updateButtonClicked" prefHeight="29.0" prefWidth="90.0" text="Update">
          <font>
             <Font size="13.0" />
          </font>
@@ -24,7 +24,12 @@
             <ListView fx:id="usersList" prefHeight="450.0" prefWidth="267.0" />
          </content>
       </ScrollPane>
-      <Button fx:id="deleteButton" layoutX="221.0" layoutY="541.0" mnemonicParsing="false" onAction="#deleteButtonClicked" prefHeight="29.0" prefWidth="90.0" text="Delete">
+      <Button fx:id="deleteButton" layoutX="235.0" layoutY="541.0" mnemonicParsing="false" onAction="#deleteButtonClicked" prefHeight="29.0" prefWidth="90.0" text="Delete">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+      <Button fx:id="viewButton" layoutX="51.0" layoutY="541.0" mnemonicParsing="false" onAction="#viewButtonClicked" prefHeight="29.0" prefWidth="90.0" text="View">
          <font>
             <Font size="13.0" />
          </font>

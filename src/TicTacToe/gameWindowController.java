@@ -11,8 +11,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -47,10 +45,13 @@ public class gameWindowController implements Initializable {
     Button b9;
 
     @FXML
-    GridPane gameBoard;
+    Button backButton;
 
     @FXML
-    MenuBar boardMenuBar;
+    Button resetButton;
+
+    @FXML
+    GridPane gameBoard;
 
     @FXML
     Label scoreBoardP1, scoreBoardP2;
@@ -78,11 +79,11 @@ public class gameWindowController implements Initializable {
         //send server what type of game it is
         //
 
+        setBoard();
 
-
-//        Server server = Server.getInstance();
-//        server.addObserver(this);
-//        refreshButtonClicked(new ActionEvent());
+        //        Server server = Server.getInstance();
+        //        server.addObserver(this);
+        //        refreshButtonClicked(new ActionEvent());
     }
 
     public void initializeName(String p1, String p2)
@@ -95,6 +96,10 @@ public class gameWindowController implements Initializable {
         scoreBoardP2.setText(p2);
         player1Name.setText(p1);
         player2Name.setText(p2);
+
+
+        backButton.getStyleClass().removeAll();
+        resetButton.getStyleClass().removeAll();
 
         p1Turn = p1 + "'s Turn!";
         p2Turn = p2 + "'s Turn!";
@@ -226,6 +231,7 @@ public class gameWindowController implements Initializable {
         Button clickedButton = (Button) evt.getTarget();
         String buttonLabel = clickedButton.getText();
 
+
         if ("".equals(buttonLabel) && isFirstPlayer) {
             turnPrompt.setText(p1Turn);
             clickedButton.setText("O");
@@ -349,42 +355,32 @@ public class gameWindowController implements Initializable {
         }
     }
 
-
-    public void menuClickHandler(ActionEvent evt) {
-
-        MenuItem clickedMenu = (MenuItem) evt.getTarget();
-        String menuLabel = clickedMenu.getText();
-
-        if ("Reset".equals(menuLabel)) {
-            gameBoard.setDisable(false);
-            ObservableList<Node> buttons =
-                    gameBoard.getChildren();
-
-            buttons.forEach(btn -> {
-                ((Button) btn).setText("");
-                stopFadeTransition((Button) btn);
-                btn.getStyleClass().remove("winning-square");
-                btn.getStyleClass().remove("tie");
-                turnPrompt.setText(p1Turn);
-                turn = 1;
-                isFirstPlayer = true;
-            });
-
-        }
-
+    @FXML
+    void backButtonClicked(ActionEvent event) throws IOException
+    {
+        Parent mainMenuWindow = FXMLLoader.load(getClass().getResource("/app/mainMenuWindow.fxml"));
+        Scene mainMenuScene = new Scene(mainMenuWindow);
+        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        window.setScene(mainMenuScene);
+        window.show();
+        resetScore();
     }
 
+    @FXML
+    void resetButtonClicked(ActionEvent event) throws IOException {
+        gameBoard.setDisable(false);
+        ObservableList<Node> buttons =
+                gameBoard.getChildren();
 
-    public void returnMainMenu(ActionEvent event) throws IOException {
-        Parent menuParent = FXMLLoader.load(getClass().getResource("MainMenu.fxml"));
-        Scene menuScene = new Scene(menuParent);
-
-        Stage menuWindow = (Stage) boardMenuBar.getScene().getWindow();
-        menuWindow.setResizable(false);
-        menuWindow.setScene(menuScene);
-        menuWindow.show();
-
-        resetScore();
+        buttons.forEach(btn -> {
+            ((Button) btn).setText("");
+            stopFadeTransition((Button) btn);
+            btn.getStyleClass().remove("winning-square");
+            btn.getStyleClass().remove("tie");
+            turnPrompt.setText(p1Turn);
+            turn = 1;
+            isFirstPlayer = true;
+        });
     }
 
     public void disableBoard()
@@ -397,16 +393,15 @@ public class gameWindowController implements Initializable {
             turnPrompt.setText(p1Turn);
             isFirstPlayer = true;
         });
-
     }
+
+    public void setBoard()
+    {
+        ObservableList<Node> buttons = gameBoard.getChildren();
+
+        buttons.forEach(btn -> {
+            btn.getStyleClass().add("boardButton");
+        });
+    }
+
 }
-
-
-
-
-
-
-
-
-
-

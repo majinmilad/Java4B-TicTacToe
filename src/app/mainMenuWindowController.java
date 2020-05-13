@@ -44,6 +44,7 @@ public class mainMenuWindowController {
         //shutdown Server upon exiting the window
         window.setOnCloseRequest(anonymF ->
         {
+            System.out.println("this happened");
             try {
                 //stop the controller's listener
                 Global.toServer.writeObject(new KillListenerMsg("for the PvP controller exit"));

@@ -412,12 +412,15 @@ public class Server extends Observable implements Runnable
                                 gameInfo.setPlayer2Username(player2.getUsername());
 
                             gameInfoList.add(gameInfo);
+
+                            System.out.println("game collected");
                         }
 
                         //send gameListMsg back to client
                         GameListMsg gameListMsg = new GameListMsg(gameInfoList);
                         client.objectOutputToClient.writeObject(gameListMsg);
                         client.objectOutputToClient.flush();
+                        System.out.println("game list flushed");
                     }
                     else if(nextMsg instanceof UserLeftLobbyMsg)
                     {
@@ -431,20 +434,27 @@ public class Server extends Observable implements Runnable
                         JoinGameRequestMsg joinGameMsg = (JoinGameRequestMsg) nextMsg;
 
                         //check if game still in WAITING mode
-                        Object game = DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + joinGameMsg.getGameInfo().getGame().getP1Id() + "\' AND gameStatus = \'WAITING\'");
+                        Game game = (Game) DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + joinGameMsg.getGameInfo().getGame().getP1Id() + "\' AND gameStatus = \'WAITING\'");
                         if(game != null)
                         {
                             User gameCreator = (User) DatabaseManager.getInstance().get(new User(joinGameMsg.getGameInfo().getPlayer1Username()));
 
-                            GameStartingMsg gameStartingMsg = new GameStartingMsg(joinGameMsg.getGameInfo(), gameCreator, joinGameMsg.getRequestingUser());
+                            if(!joinGameMsg.getRequestingUser().getUserID().equals(gameCreator.getUserID()))
+                            {
+                                GameStartingMsg gameStartingMsg = new GameStartingMsg(joinGameMsg.getGameInfo(), gameCreator, joinGameMsg.getRequestingUser());
 
-                            //send to game creator
-                            clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.writeObject(gameStartingMsg);
-                            clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.flush();
+                                //send to game creator
+                                clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.writeObject(gameStartingMsg);
+                                clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.flush();
 
-                            //send to second player
-                            client.objectOutputToClient.writeObject(gameStartingMsg);
-                            client.objectOutputToClient.flush();
+                                //send to second player
+                                client.objectOutputToClient.writeObject(gameStartingMsg);
+                                client.objectOutputToClient.flush();
+
+                                //set game to RUNNING
+                                game.setStatus("RUNNING");
+                                DatabaseManager.getInstance().update(game);
+                            }
                         }
                     }
                     else if(nextMsg instanceof KillListenerMsg)
@@ -458,7 +468,7 @@ public class Server extends Observable implements Runnable
                         ViewGameMsg viewGameMsg = (ViewGameMsg) nextMsg;
                         Object liveGame = DatabaseManager.getInstance().query(new Game(), "WHERE gameId = \'" + viewGameMsg.getNewViewer().getId()
                                 + "\' "
-                                + "AND status != 'ENDED' " );
+                                + "AND status != 'ENDED'" );
 
                         // Game is still running
                         if(liveGame != null)
@@ -474,8 +484,6 @@ public class Server extends Observable implements Runnable
                         {
                             // Notify that game has ended
                         }
-
-
                     }
                 }
                 catch (InterruptedException | IOException e) {

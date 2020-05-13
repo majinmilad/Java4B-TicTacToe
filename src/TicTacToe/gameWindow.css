@@ -1,4 +1,4 @@
-.button{
+.boardButton{
     -fx-focus-color: transparent;
     -fx-background-color: black /*rgba(31, 28, 192, 0.98)*/;
     -fx-background-insets: -1, 0, 1, 1;
@@ -19,8 +19,9 @@
     -fx-text-alignment: center;
     -fx-border-color: transparent;
     -fx-padding:1em 2em 1.5em 2em;
-
 }
+
+
 
 .button:hover {
     -fx-border-color: derive(white, -20%);

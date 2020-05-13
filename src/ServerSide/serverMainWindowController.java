@@ -60,6 +60,7 @@ public class serverMainWindowController implements Observer, Initializable {
     @FXML
     void refreshButtonClicked(ActionEvent event)
     {
+        // Online user list refresh
         onlineUserBox.clear();
 
         List<BaseModel> list = DatabaseManager.getInstance().queryList(new User(), "AND status = 'ONLINE'");
@@ -68,6 +69,9 @@ public class serverMainWindowController implements Observer, Initializable {
         {
             onlineUserBox.appendText(((User) u).getUsername() + "\n");
         }
+
+        // Game Table refresh
+
     }
 
     @Override

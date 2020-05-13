@@ -30,7 +30,7 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <Button fx:id="modifyUserButton" layoutX="21.0" layoutY="736.0" mnemonicParsing="false" onAction="#modifyUserButtonClicked" prefHeight="50.0" prefWidth="225.0" text="Modify User" />
+            <Button fx:id="modifyUserButton" layoutX="21.0" layoutY="736.0" mnemonicParsing="false" onAction="#modifyUserButtonClicked" prefHeight="50.0" prefWidth="225.0" text="Registered Users" />
             <TextArea fx:id="gameMessageBox" layoutX="653.0" layoutY="444.0" prefHeight="342.0" prefWidth="528.0" />
             <Label alignment="CENTER" layoutX="759.0" layoutY="400.0" prefHeight="50.0" prefWidth="316.0" text="Game Messages" textFill="WHITE">
                <font>
