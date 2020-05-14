@@ -41,10 +41,9 @@ public class mainMenuWindowController {
         window.setScene(playerLobbyScene);
         window.show();
 
-        //shutdown Server upon exiting the window
+        //shutdown Listener thread in pvpLobby upon exiting the window
         window.setOnCloseRequest(anonymF ->
         {
-            System.out.println("this happened");
             try {
                 //stop the controller's listener
                 Global.toServer.writeObject(new KillListenerMsg("for the PvP controller exit"));

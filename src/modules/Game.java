@@ -81,7 +81,9 @@ public class Game extends BaseModel
         this.p2Id = p2Id;
     }
 
-    private void setEndTime() { endTime = generateTime(); }
+    public void setStartTime() { startTime = generateTime(); }
+
+    public void setEndTime() { endTime = generateTime(); }
 
     public void setWinnerId(String winnerId) {
         this.winnerId = winnerId;

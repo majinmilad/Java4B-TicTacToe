@@ -11,13 +11,13 @@ import java.util.Stack;
 
 // a static class used to provide shared resources among the controllers
 
-class Global
+public class Global
 {
     // SOCKET WITH THE SERVER
 
     static Socket socketWithServer;
-    static ObjectOutputStream toServer;
-    static ObjectInputStream fromServer;
+    public static ObjectOutputStream toServer;
+    public static ObjectInputStream fromServer;
 
     static void setSocketWithServer(Socket s) throws IOException {
         socketWithServer = s;
@@ -42,7 +42,7 @@ class Global
             currentUser = null;
         }
 
-        static User getCurrentUser()
+        public static User getCurrentUser()
         {
             return currentUser;
         }

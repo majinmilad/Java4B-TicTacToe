@@ -5,18 +5,29 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.SimpleFormatter;
 
-public class Moves  extends BaseModel{
+public class Move extends BaseModel
+{
     private String gameId;
+    private String playerId;
     private int Xcoord;
     private int Ycoord;
     private String time;
 
-    Moves()
+    Move()
     {
 
     }
 
-    public Moves(String gameId, String playerId, int X, int Y, String time)
+    public Move(String gameId, String playerId, int X, int Y)
+    {
+        setId(playerId);
+        setGameId(gameId);
+        setXcoord(X);
+        setYcoord(Y);
+        setInitialTime();
+    }
+
+    public Move(String gameId, String playerId, int X, int Y, String time)
     {
         setId(playerId);
         setGameId(gameId);
@@ -31,6 +42,21 @@ public class Moves  extends BaseModel{
         Date date = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         time  = dateFormat.format(date);
+    }
+
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public String getPlayerId() { return playerId; }
+
+    public int getXcoord() {
+        return Xcoord;
+    }
+
+    public int getYcoord() {
+        return Ycoord;
     }
 
     public String getTime()
@@ -52,16 +78,4 @@ public class Moves  extends BaseModel{
     }
 
     public void setGameId(String id) {this.gameId = id;}
-
-    public int getXcoord() {
-        return Xcoord;
-    }
-
-    public int getYcoord() {
-        return Ycoord;
-    }
-
-    public String getGameId() {
-        return gameId;
-    }
 }

@@ -441,6 +441,7 @@ public class Server extends Observable implements Runnable
 
                             if(!joinGameMsg.getRequestingUser().getUserID().equals(gameCreator.getUserID()))
                             {
+                                //start the game
                                 GameStartingMsg gameStartingMsg = new GameStartingMsg(joinGameMsg.getGameInfo(), gameCreator, joinGameMsg.getRequestingUser());
 
                                 //send to game creator
@@ -451,8 +452,11 @@ public class Server extends Observable implements Runnable
                                 client.objectOutputToClient.writeObject(gameStartingMsg);
                                 client.objectOutputToClient.flush();
 
-                                //set game to RUNNING
+                                //set game's player2Id, startTime, and its status to RUNNING
+                                game.setP2Id(joinGameMsg.getRequestingUser().getUserID());
+                                game.setStartTime();
                                 game.setStatus("RUNNING");
+                                game.displayAll();
                                 DatabaseManager.getInstance().update(game);
                             }
                         }
@@ -462,29 +466,46 @@ public class Server extends Observable implements Runnable
                         client.objectOutputToClient.writeObject(nextMsg);
                         client.objectOutputToClient.flush();
                     }
-                    else if(nextMsg instanceof ViewGameMsg)
+                    else if(nextMsg instanceof MoveMadeMsg)
                     {
-
-                        ViewGameMsg viewGameMsg = (ViewGameMsg) nextMsg;
-                        Object liveGame = DatabaseManager.getInstance().query(new Game(), "WHERE gameId = \'" + viewGameMsg.getNewViewer().getId()
-                                + "\' "
-                                + "AND status != 'ENDED'" );
-
-                        // Game is still running
-                        if(liveGame != null)
+                        MoveMadeMsg moveMsg = (MoveMadeMsg) nextMsg;
+                        //write to db
+                        Object successfulInsert = DatabaseManager.getInstance().insert(moveMsg.getMove());
+                        //propagate move
+                        if(successfulInsert != null)
                         {
-                            // Gets the Game Viewer Class w/ gameId + viewerId
-                            GameViewers newViewer = viewGameMsg.getNewViewer();
-                            // Adds Game Viewer Id into DB
-                            DatabaseManager.getInstance().insert(newViewer);
+                            Game game = (Game) DatabaseManager.getInstance().query(new Game(), "WHERE UUID = \'" + moveMsg.getMove().getGameId() + "\' AND gameStatus = \'RUNNING\'");
 
-                            // Add Viewer to Game & A Subscribed list?
-                        }
-                        else
-                        {
-                            // Notify that game has ended
+                            //send move to other player
+                            if(moveMsg.getMoveMadeByUser().getUserID().equals(game.getP1Id()))
+                                clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.writeObject(moveMsg);
+                            else
+                                clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.writeObject(moveMsg);
                         }
                     }
+//                    else if(nextMsg instanceof ViewGameMsg)
+//                    {
+//
+//                        ViewGameMsg viewGameMsg = (ViewGameMsg) nextMsg;
+//                        Object liveGame = DatabaseManager.getInstance().query(new Game(), "WHERE gameId = \'" + viewGameMsg.getNewViewer().getId()
+//                                + "\' "
+//                                + "AND status != 'ENDED'" );
+//
+//                        // Game is still running
+//                        if(liveGame != null)
+//                        {
+//                            // Gets the Game Viewer Class w/ gameId + viewerId
+//                            GameViewers newViewer = viewGameMsg.getNewViewer();
+//                            // Adds Game Viewer Id into DB
+//                            DatabaseManager.getInstance().insert(newViewer);
+//
+//                            // Add Viewer to Game & A Subscribed list?
+//                        }
+//                        else
+//                        {
+//                            // Notify that game has ended
+//                        }
+//                    }
                 }
                 catch (InterruptedException | IOException e) {
                     System.out.println("exception caught in server Publisher's run()");

@@ -78,11 +78,14 @@ public class lobbyPvPController implements Initializable {
     @FXML
     void joinGameButtonClicked(ActionEvent event) throws IOException
     {
-        GameInfo gameSelected = gameList.getSelectionModel().getSelectedItem().getGameInfo();
+        if(gameList.getSelectionModel().getSelectedItem() != null)
+        {
+            GameInfo gameSelected = gameList.getSelectionModel().getSelectedItem().getGameInfo();
 
-        //send join a game request to server
-        Global.toServer.writeObject(new JoinGameRequestMsg(gameSelected, Global.CurrentAccount.getCurrentUser()));
-        Global.toServer.flush();
+            //send join a game request to server
+            Global.toServer.writeObject(new JoinGameRequestMsg(gameSelected, Global.CurrentAccount.getCurrentUser()));
+            Global.toServer.flush();
+        }
     }
 
     @FXML
@@ -98,21 +101,37 @@ public class lobbyPvPController implements Initializable {
     @FXML
     void playLocallyButtonClicked(ActionEvent event) throws IOException
     {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/TicTacToe/gameWindow.fxml"));
-        Parent gameParent = loader.load();
+        //stop the controller's listener
+        Global.toServer.writeObject(new KillListenerMsg("from lobbyPvPController"));
+        Global.toServer.flush();
 
-        //set players involved in the controller
-        gameWindowController setController = loader.getController();
-        setController.initializeName("Player 1", "Player 2");
+        while(listener.thread.isAlive()) //wait for listener thread to shutdown
+        {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/TicTacToe/gameWindow.fxml"));
+            Parent gameParent = loader.load();
 
-        //show the game window
-        Scene gameScene = new Scene(gameParent, 800, 600);
-        gameScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
-        Stage gameStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        gameStage.setScene(gameScene);
-        gameStage.show();
+            //set players involved in the controller
+            gameWindowController setController = loader.getController();
+            setController.initializeName("Player 1", "Player 2");
+            setController.setItsYourTurn(true);
 
-        listener.setStopSignal();
+            //show the game window
+            Scene gameScene = new Scene(gameParent, 800, 600);
+            gameScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+            Stage gameStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            gameStage.setScene(gameScene);
+            gameStage.show();
+
+            //shutdown Listener thread in game controller upon exiting the window
+            gameStage.setOnCloseRequest(anonymF ->
+            {
+                try {
+                    //stop the controller's listener
+                    Global.toServer.writeObject(new KillListenerMsg("for the game window controller exit"));
+                    Global.toServer.flush();
+                } catch (IOException e) { e.printStackTrace(); }
+            });
+        }
     }
 
     @FXML
@@ -185,70 +204,85 @@ public class lobbyPvPController implements Initializable {
                     }
                     else
                     {
-                        //perform action on FX application thread
-                                if(serverMsg instanceof GameCreatedMsg)
-                                {
-                                    GameCreatedMsg gameCreatedMsg = (GameCreatedMsg) serverMsg;
+                        //perform certain actions on FX application thread
 
-                                    //add game to lobby
-                                    GameInfo gameInfo = new GameInfo();
-                                    gameInfo.setGame(gameCreatedMsg.getGame());
-                                    gameInfo.setPlayer1Username(Global.CurrentAccount.getCurrentUser().getUsername());
+                        if(serverMsg instanceof GameCreatedMsg)
+                        {
+                            GameCreatedMsg gameCreatedMsg = (GameCreatedMsg) serverMsg;
 
-                                    GameInList g = new GameInList();
-                                    g.setGameInfo(gameInfo);
+                            //add game to lobby
+                            GameInfo gameInfo = new GameInfo();
+                            gameInfo.setGame(gameCreatedMsg.getGame());
+                            gameInfo.setPlayer1Username(Global.CurrentAccount.getCurrentUser().getUsername());
 
-                                    Platform.runLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            gameList.getItems().add(g);
-                                        }
-                                    });
+                            GameInList g = new GameInList();
+                            g.setGameInfo(gameInfo);
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    gameList.getItems().add(g);
                                 }
-                                else if(serverMsg instanceof UserHasGameOpenMsg)
-                                {
-                                    Platform.runLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            //display a message
-                                            Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
-                                            alert.setTitle("Game in Progress");
-                                            alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
-                                            Optional<ButtonType> buttonResult = alert.showAndWait();
-                                        }
-                                    });
+                            });
+                        }
+                        else if(serverMsg instanceof UserHasGameOpenMsg)
+                        {
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //display a message
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
+                                    alert.setTitle("Game in Progress");
+                                    alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
+                                    Optional<ButtonType> buttonResult = alert.showAndWait();
                                 }
-                                else if(serverMsg instanceof GameStartingMsg)
-                                {
-                                    System.out.println("before " + keepRunning);
-                                    setStopSignal();
-                                    System.out.println(keepRunning);
+                            });
+                        }
+                        else if(serverMsg instanceof GameStartingMsg)
+                        {
+                            setStopSignal();
 
-                                    Platform.runLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            //open game
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //open game
+                                    try {
+                                        GameStartingMsg msg = (GameStartingMsg) serverMsg;
+
+                                        FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
+                                        Parent boardParent = loader.load();
+
+                                        //set values
+                                        gameWindowController setController = loader.getController();
+                                        setController.initializeName(msg.getCreatedGamePlayer().getUsername(), msg.getJoiningGamePlayer().getUsername());
+                                        setController.setThisGameID(msg.getGameInfo().getGame().getGameId());
+                                        if(msg.getCreatedGamePlayer().getUserID().equals(Global.CurrentAccount.getCurrentUser().getUserID()))
+                                            setController.setItsYourTurn(true);
+                                        else
+                                            setController.setItsYourTurn(false);
+
+                                        Scene boardScene = new Scene(boardParent, 800, 600);
+                                        boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+
+                                        Stage boardWindow = (Stage) backButton.getScene().getWindow();;
+                                        boardWindow.setScene(boardScene);
+                                        boardWindow.show();
+
+                                        //shutdown Listener thread in game controller upon exiting the window
+                                        boardWindow.setOnCloseRequest(anonymF ->
+                                        {
                                             try {
-                                                FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
-                                                Parent boardParent = loader.load();
-
-                                                gameWindowController setController = loader.getController();
-                                                setController.initializeName("Player 1", "Player 2");
-
-                                                Scene boardScene = new Scene(boardParent, 800, 600);
-                                                boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
-
-                                                Stage boardWindow = (Stage) backButton.getScene().getWindow();;
-                                                boardWindow.setScene(boardScene);
-                                                boardWindow.show();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-
-                                    //System.out.println("game has been opened for " + Global.CurrentAccount.getCurrentUser().getUsername()+"!!!\n");
+                                                //stop the controller's listener
+                                                Global.toServer.writeObject(new KillListenerMsg("for the game window controller exit"));
+                                                Global.toServer.flush();
+                                            } catch (IOException e) { e.printStackTrace(); }
+                                        });
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
+                            });
+                        }
 
                         System.out.println("message processed in listener");
                     }

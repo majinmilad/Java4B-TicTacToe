@@ -5,6 +5,7 @@ import modules.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
+import java.util.UUID;
 
 public class DatabaseManager implements DataSource {
     private static DatabaseManager instance = null;
@@ -76,13 +77,15 @@ public class DatabaseManager implements DataSource {
             qryBuilder.append("Game (p1Id, p2Id, creatorId, gameStatus, UUID) " +
                     "VALUES (\'" + g.getP1Id() + "\', \'" + g.getP2Id() + "\', \'" + g.getCreatorId() + "\', \'WAITING\', \'" + g.getGameId() + "\')");
         }
-        else if(obj instanceof Moves)
+        else if(obj instanceof Move)
         {
-            Moves m = (Moves) obj;
+            Move m = (Move) obj;
 
-            qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time) " +
-                    "VALUES ( " + m.getGameId() +  ", " + m.getId() + ", " + m.getXcoord()
-                    + ", " + m.getYcoord() + ", \'" + m.getTime() + "\')" );
+            UUID uniqueId = UUID.randomUUID();
+
+            qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time,UUID) " +
+                    "VALUES (\'" + m.getGameId() +  "\', \'" + m.getId() + "\', " + m.getXcoord()
+                    + ", " + m.getYcoord() + ", \'" + m.getTime() + "\', \'" + uniqueId + "\')");
         }
         else if(obj instanceof GameViewers)
         {
@@ -230,7 +233,7 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof Game)
         {
 //            Game g = (Game) obj;
-//            qryBuilder.append("FROM Game " + "WHERE id = \'" + g.getId() + "\'" );
+//            qryBuilder.append("FROM Game " + "WHERE UUID = \'" + g.getGameId() + "\'" );
 //
 //            try {
 //                ResultSet rs = executeQuery(qryBuilder.toString());
@@ -282,25 +285,6 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof Game)
         {
             qryBuilder.append("* FROM Game " + filter + " LIMIT 1");
-
-            /*
-                    @ To get game history
-                    "WHERE p1Id = \'" +  playerID  + "\' "
-                   + OR p2Id = \'" +  playerID + "\' "
-
-                    @ To Get Active Games
-                    "WHERE endTime != NULL "
-                  + "ORDER BY id ASC "
-
-                    @ To Get Completed Games
-                    "WHERE endTime = NULL "
-                  + "ORDER BY id ASC "
-
-                    @ To See if Player is playing
-                     "WHERE p1Id = \'" +  playerID  + "\' "
-                   + "OR p2Id = \'" +  playerID + "\' "
-                   + "AND endTime != NULL "
-             */
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
@@ -376,9 +360,9 @@ public class DatabaseManager implements DataSource {
                 e.printStackTrace();
             }
         }
-        else if (obj instanceof Moves)
+        else if (obj instanceof Move)
         {
-            Moves moves = (Moves) obj;
+            Move moves = (Move) obj;
             qryBuilder.append("FROM Moves "
                     +  "WHERE gameId = \'" + moves.getGameId() + "\' "
                     +  "ORDER BY time ASC;");
@@ -387,7 +371,7 @@ public class DatabaseManager implements DataSource {
                 ResultSet   rs = executeQuery(qryBuilder.toString());
                 while(rs.next())
                 {
-                    Moves m = new Moves(rs.getString("gameId"), rs.getString("playerId"), Integer.parseInt(rs.getString("X_coord")),
+                    Move m = new Move(rs.getString("gameId"), rs.getString("playerId"), Integer.parseInt(rs.getString("X_coord")),
                             Integer.parseInt(rs.getString("Y_coord")), rs.getString("time"));
                     list.add(m);
                 }

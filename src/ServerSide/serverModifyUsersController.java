@@ -1,7 +1,6 @@
 package ServerSide;
 
 import Messages.DeleteUserMsg;
-import TicTacToe.gameWindowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
