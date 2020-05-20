@@ -139,7 +139,7 @@ public class gameInfoController implements Initializable {
     }
 
     private void getViewers() {
-        ArrayList<BaseModel> viewers = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new GameViewers(currentGame.getGameId(), ""), "");
+        ArrayList<BaseModel> viewers = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new GameViewers(currentGame.getGameId(), "", ""), "");
         if (viewers.size() > 0) {
             User temp = new User();
             for (BaseModel element : viewers) {

@@ -26,7 +26,9 @@ import javafx.util.Pair;
 import modules.User;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -150,7 +152,10 @@ public class gameWindowController implements Initializable
         if ("".equals(buttonLabel) && itsYourTurn) //make your move
         {
             clickedButton.setText(yourSymbol);
-            clickedButton.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(yourSymbol);
+            clickedButton.setTextFill(symbolColor);
+
+           // clickedButton.setTextFill(Color.DODGERBLUE);
             itsYourTurn = false;
             turnPrompt.setText(opponentTurnPrompt);
             turnNumber++;
@@ -440,47 +445,67 @@ public class gameWindowController implements Initializable
         if(b1.getId().equals(buttonLabel))
         {
             b1.setText(symbol);
-            b1.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b1.setTextFill(symbolColor);
         }
         else if(b2.getId().equals(buttonLabel))
         {
             b2.setText(symbol);
-            b2.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b2.setTextFill(symbolColor);
         }
         else if(b3.getId().equals(buttonLabel))
         {
             b3.setText(symbol);
-            b3.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b3.setTextFill(symbolColor);
         }
         else if(b4.getId().equals(buttonLabel))
         {
             b4.setText(symbol);
-            b4.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b4.setTextFill(symbolColor);
         }
         else if(b5.getId().equals(buttonLabel))
         {
             b5.setText(symbol);
-            b5.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b5.setTextFill(symbolColor);
         }
         else if(b6.getId().equals(buttonLabel))
         {
             b6.setText(symbol);
-            b6.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b6.setTextFill(symbolColor);
         }
         else if(b7.getId().equals(buttonLabel))
         {
             b7.setText(symbol);
-            b7.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b7.setTextFill(symbolColor);
         }
         else if(b8.getId().equals(buttonLabel))
         {
             b8.setText(symbol);
-            b8.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b8.setTextFill(symbolColor);
         }
         else if(b9.getId().equals(buttonLabel))
         {
             b9.setText(symbol);
-            b9.setTextFill(Color.DODGERBLUE);
+            Color symbolColor = checkSymbol(symbol);
+            b9.setTextFill(symbolColor);
+        }
+    }
+
+    private Color checkSymbol(String symbol) {
+        if(symbol.equalsIgnoreCase("O"))
+        {
+            return Color.DODGERBLUE;
+        }
+        else
+        {
+            return Color.DARKKHAKI;
         }
     }
 
@@ -622,18 +647,27 @@ public class gameWindowController implements Initializable
     }
 
     private boolean find3InARow() {
+        ArrayList<Button> winners = new ArrayList<>();
+
         //Row 1
         if ("" != b1.getText() && b1.getText() == b2.getText()
                 && b2.getText() == b3.getText()) {
             disableBoard();
             highlightWinningCombo(b1, b2, b3);
+//            winners.add(b1);
+//            winners.add(b2);
+//            winners.add(b3);
             return true;
+
         }
         //Row 2
         if ("" != b4.getText() && b4.getText() == b5.getText()
                 && b5.getText() == b6.getText()) {
             disableBoard();
             highlightWinningCombo(b4, b5, b6);
+//            winners.add(b4);
+//            winners.add(b5);
+//            winners.add(b6);
             return true;
         }
         //Row 3
@@ -641,6 +675,9 @@ public class gameWindowController implements Initializable
                 && b8.getText() == b9.getText()) {
             disableBoard();
             highlightWinningCombo(b7, b8, b9);
+//            winners.add(b7);
+//            winners.add(b8);
+//            winners.add(b9);
             return true;
         }
         //Column 1
@@ -648,6 +685,9 @@ public class gameWindowController implements Initializable
                 && b4.getText() == b7.getText()) {
             disableBoard();
             highlightWinningCombo(b1, b4, b7);
+//            winners.add(b1);
+//            winners.add(b4);
+//            winners.add(b7);
             return true;
         }
         //Column 2
@@ -655,6 +695,9 @@ public class gameWindowController implements Initializable
                 && b5.getText() == b8.getText()) {
             disableBoard();
             highlightWinningCombo(b2, b5, b8);
+//            winners.add(b2);
+//            winners.add(b5);
+//            winners.add(b8);
             return true;
         }
         //Column 3
@@ -662,6 +705,9 @@ public class gameWindowController implements Initializable
                 && b6.getText() == b9.getText()) {
             disableBoard();
             highlightWinningCombo(b3, b6, b9);
+//            winners.add(b3);
+//            winners.add(b6);
+//            winners.add(b9);
             return true;
         }
         //Diagonal 1
@@ -669,6 +715,9 @@ public class gameWindowController implements Initializable
                 && b5.getText() == b9.getText()) {
             disableBoard();
             highlightWinningCombo(b1, b5, b9);
+//            winners.add(b1);
+//            winners.add(b5);
+//            winners.add(b9);
             return true;
         }
         //Diagonal 2
@@ -676,6 +725,9 @@ public class gameWindowController implements Initializable
                 && b5.getText() == b7.getText()) {
             disableBoard();
             highlightWinningCombo(b3, b5, b7);
+//            winners.add(b3);
+//            winners.add(b5);
+//            winners.add(b7);
             return true;
         }
         return false;

@@ -220,9 +220,9 @@ public class viewPlayerController{
     {
 
         try{
-            selectedGame = gameList.getSelectionModel().getSelectedItem().getGameInfo().getGame();
             gameDetails.getChildren().clear();
             moveBox.getChildren().clear();
+            selectedGame = gameList.getSelectionModel().getSelectedItem().getGameInfo().getGame();
             tPane.getSelectionModel().select(0);
             ArrayList<BaseModel> viewers;
 

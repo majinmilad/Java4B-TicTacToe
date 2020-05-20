@@ -222,7 +222,7 @@ public class gameHistoryController implements Initializable {
 //                    + "\nPlayer 2: " + p2.getUsername() + " " + p2.getUserID()
 //                    + "\nWinner: " + winner.getUsername() + " " + winner.getUserID() + "\n\nViewers:\n");
 
-            viewers = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new GameViewers(selectedGame.getGameId(), ""), "");
+            viewers = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new GameViewers(selectedGame.getGameId(), "", ""), "");
             if (viewers.size() > 0) {
                 User temp = new User();
                 for (BaseModel element : viewers) {

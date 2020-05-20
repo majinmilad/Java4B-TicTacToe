@@ -5,6 +5,7 @@ import modules.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
+import java.util.UUID;
 
 public class DatabaseManager implements DataSource {
     private static DatabaseManager instance = null;
@@ -80,9 +81,11 @@ public class DatabaseManager implements DataSource {
         {
             Move m = (Move) obj;
 
-            qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time) " +
-                    "VALUES ( " + m.getGameId() +  ", " + m.getId() + ", " + m.getXcoord()
-                    + ", " + m.getYcoord() + ", \'" + m.getTime() + "\')" );
+            UUID uniqueId = UUID.randomUUID();
+
+            qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time,UUID) " +
+                    "VALUES (\'" + m.getGameId() +  "\', \'" + m.getId() + "\', " + m.getXcoord()
+                    + ", " + m.getYcoord() + ", \'" + m.getTime() + "\', \'" + uniqueId + "\')");
         }
         else if(obj instanceof GameViewers)
         {

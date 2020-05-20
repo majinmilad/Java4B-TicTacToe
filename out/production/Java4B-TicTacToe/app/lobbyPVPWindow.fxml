@@ -37,6 +37,11 @@
                   <Font size="18.0" />
                </font>
             </Button>
+            <Button id="nextButtonLogin" fx:id="refreshButton" layoutX="14.0" layoutY="178.0" mnemonicParsing="false" onAction="#refreshButtonClicked" prefHeight="45.0" prefWidth="87.0" style="-fx-background-color: rgb(214, 214, 214);" text="Refresh">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
          </children>
       </Pane>
    </children>
