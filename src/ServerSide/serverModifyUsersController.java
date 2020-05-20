@@ -44,6 +44,35 @@ public class serverModifyUsersController implements Initializable {
     @FXML
     void viewButtonClicked(ActionEvent event)
     {
+        User user = new User(usersList.getSelectionModel().getSelectedItem());
+        user = (User) DatabaseManager.getInstance().get(user);
+
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ServerSide/viewPlayer.fxml"));
+            Parent viewParent = loader.load();
+
+            //set user involved in the controller
+            viewPlayerController setController = loader.getController();
+            setController.initUser(user);
+
+            //show update window
+            Scene viewScene = new Scene(viewParent);
+            Stage viewStage = (Stage) ((Node) event.getSource()).getScene().getWindow();;
+            viewStage.setScene(viewScene);
+            viewStage.show();
+
+            /*
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("gameHistoryWindow.fxml"));
+        Parent gHistoryParent = loader.load();
+        Scene gHistoryScene = new Scene(gHistoryParent);
+        Stage gHistoryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        gHistoryStage.setScene(gHistoryScene);
+        gHistoryStage.show();
+             */
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -84,6 +113,7 @@ public class serverModifyUsersController implements Initializable {
             populateUserList();
         }
     }
+
 
     private void populateUserList()
     {

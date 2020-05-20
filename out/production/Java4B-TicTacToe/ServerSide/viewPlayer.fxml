@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="586.0" prefWidth="920.0" style="-fx-background-color: linear-gradient(to top, #1D4350,  #A43931);" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ServerSide.viewPlayerController">
+   <children>
+      <Label fx:id="nameHistory" alignment="CENTER" layoutX="298.0" layoutY="14.0" prefHeight="56.0" prefWidth="323.0" text="History" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="39.0" />
+         </font>
+      </Label>
+      <ListView fx:id="gameList" layoutX="327.0" layoutY="144.0" onMouseClicked="#getGameDetails" prefHeight="370.0" prefWidth="255.0" style="-fx-font-weight: bold;" />
+      <Label alignment="BOTTOM_CENTER" layoutX="335.0" layoutY="101.0" prefHeight="42.0" prefWidth="238.0" text="Match History" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label alignment="BOTTOM_CENTER" layoutX="686.0" layoutY="101.0" prefHeight="42.0" prefWidth="134.0" text="Match Details" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <TabPane fx:id="tPane" layoutX="609.0" layoutY="144.0" prefHeight="370.0" prefWidth="288.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="generaltab" style="-fx-font-weight: bold;" text="General">
+               <content>
+                  <ScrollPane fitToHeight="true" fitToWidth="true">
+                     <content>
+                        <TextFlow fx:id="gameDetails" prefHeight="370.0" prefWidth="390.0" style="-fx-background-color: white;" />
+                     </content>
+                  </ScrollPane>
+               </content>
+          </Tab>
+          <Tab fx:id="moveTab" style="-fx-font-weight: bold;" text="Moves">
+               <content>
+                  <ScrollPane fitToHeight="true" fitToWidth="true">
+                     <content>
+                        <TextFlow fx:id="moveBox" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" />
+                     </content>
+                  </ScrollPane>
+               </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+      <Label alignment="BOTTOM_CENTER" contentDisplay="CENTER" layoutX="63.0" layoutY="289.0" prefHeight="30.0" prefWidth="186.0" text="Current Status" textFill="WHITE" underline="true">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="currentStat" alignment="BOTTOM_CENTER" layoutX="12.0" layoutY="332.0" prefHeight="30.0" prefWidth="288.0" text="Playing Game" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label alignment="BOTTOM_CENTER" layoutX="13.0" layoutY="367.0" prefHeight="8.0" prefWidth="288.0" text="ID: e4700134-6048-47c5-9466-037c1ed6f893" textFill="#ffffff00">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label alignment="BOTTOM_CENTER" layoutX="116.0" layoutY="411.0" prefHeight="0.0" prefWidth="82.0" text="W/L/T" textFill="WHITE" underline="true">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <HBox layoutX="59.0" layoutY="441.0" prefHeight="56.0" prefWidth="195.0">
+         <children>
+            <Label fx:id="wScore" alignment="CENTER" contentDisplay="CENTER" prefHeight="56.0" prefWidth="43.0" text="0" textAlignment="CENTER" textFill="LIMEGREEN">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="56.0" prefWidth="31.0" text="/" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Label>
+            <Label fx:id="lScore" alignment="CENTER" contentDisplay="CENTER" prefHeight="56.0" prefWidth="43.0" text="0" textAlignment="CENTER" textFill="RED">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="56.0" prefWidth="31.0" text="/" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Label>
+            <Label fx:id="tScore" alignment="CENTER" contentDisplay="CENTER" prefHeight="56.0" prefWidth="43.0" text="0" textAlignment="CENTER" textFill="DARKBLUE">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <Label alignment="BOTTOM_CENTER" layoutX="69.0" layoutY="128.0" prefHeight="30.0" prefWidth="186.0" text="Player Information" textFill="WHITE" underline="true">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="14.0" layoutY="172.0" prefHeight="19.0" prefWidth="94.0" text="Username:" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Label>
+      <Label fx:id="pUsername" layoutX="109.0" layoutY="172.0" prefHeight="26.0" prefWidth="186.0" text="sssssssssssssssssssss" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="23.0" layoutY="229.0" prefHeight="26.0" prefWidth="31.0" text="ID:" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Label>
+      <Label fx:id="pId" layoutX="57.0" layoutY="229.0" prefHeight="26.0" prefWidth="255.0" text="e4700134-6048-47c5-9466-037c1ed6f893" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

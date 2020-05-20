@@ -11,31 +11,31 @@
    <children>
       <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: linear-gradient(to top, #1D4350,  #A43931);">
          <children>
-            <Button id="nextButtonLogin" fx:id="update" layoutX="234.0" layoutY="297.0" mnemonicParsing="false" onAction="#updateButtonClicked" prefHeight="39.0" prefWidth="132.0" style="-fx-background-color: rgb(214, 214, 214);" text="Update">
+            <Button id="nextButtonLogin" fx:id="update" layoutX="183.0" layoutY="339.0" mnemonicParsing="false" onAction="#updateButtonClicked" prefHeight="39.0" prefWidth="132.0" style="-fx-background-color: rgb(214, 214, 214);" text="Update">
                <font>
                   <Font name="Bookman Old Style Bold" size="14.0" />
                </font>
             </Button>
-            <TextField id="usernameInput" fx:id="username" alignment="CENTER" layoutX="180.0" layoutY="96.0" prefHeight="27.0" prefWidth="240.0" promptText="Username" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
+            <TextField id="usernameInput" fx:id="username" alignment="CENTER" layoutX="249.0" layoutY="105.0" prefHeight="27.0" prefWidth="240.0" promptText="Username" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
                <font>
                   <Font size="15.0" />
                </font></TextField>
-            <TextField id="usernameInput" fx:id="firstName" alignment="CENTER" layoutX="180.0" layoutY="145.0" prefHeight="27.0" prefWidth="240.0" promptText="First Name" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
+            <TextField id="usernameInput" fx:id="firstName" alignment="CENTER" layoutX="249.0" layoutY="154.0" prefHeight="27.0" prefWidth="240.0" promptText="First Name" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
                <font>
                   <Font size="15.0" />
                </font>
             </TextField>
-            <TextField id="usernameInput" fx:id="lastName" alignment="CENTER" layoutX="180.0" layoutY="193.0" prefHeight="27.0" prefWidth="240.0" promptText="Last Name" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
+            <TextField id="usernameInput" fx:id="lastName" alignment="CENTER" layoutX="249.0" layoutY="202.0" prefHeight="27.0" prefWidth="240.0" promptText="Last Name" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
                <font>
                   <Font size="15.0" />
                </font>
             </TextField>
-            <TextField id="usernameInput" fx:id="password" alignment="CENTER" layoutX="180.0" layoutY="243.0" prefHeight="27.0" prefWidth="240.0" promptText="Password" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
+            <TextField id="usernameInput" fx:id="password" alignment="CENTER" layoutX="249.0" layoutY="252.0" prefHeight="27.0" prefWidth="240.0" promptText="Password" style="-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-border-color: translucent; -fx-border-width: 1 1 1 1;">
                <font>
                   <Font size="15.0" />
                </font>
             </TextField>
-            <Label alignment="CENTER" layoutX="44.0" layoutY="21.0" prefHeight="50.0" prefWidth="512.0" text="CHANGE USER INFORMATION" textFill="WHITE">
+            <Label alignment="CENTER" layoutX="74.0" layoutY="14.0" prefHeight="50.0" prefWidth="512.0" text="CHANGE USER INFORMATION" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>
@@ -45,27 +45,32 @@
                   <Font name="Bookman Old Style Bold" size="14.0" />
                </font>
             </Button>
-            <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="180.0" layoutY="349.0" prefHeight="22.0" prefWidth="240.0" style="-fx-background-color: transparent; -fx-text-fill: red;" textAlignment="CENTER" />
-            <Label layoutX="111.0" layoutY="101.0" prefHeight="19.0" prefWidth="70.0" text="Username" textFill="WHITE">
+            <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="210.0" layoutY="298.0" prefHeight="22.0" prefWidth="240.0" style="-fx-background-color: transparent; -fx-text-fill: red;" textAlignment="CENTER" />
+            <Label layoutX="172.0" layoutY="108.0" prefHeight="21.0" prefWidth="73.0" text="Username" textFill="WHITE">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <Label layoutX="110.0" layoutY="150.0" prefHeight="19.0" prefWidth="70.0" text="First Name" textFill="WHITE">
+            <Label layoutX="171.0" layoutY="159.0" prefHeight="21.0" prefWidth="73.0" text="First Name" textFill="WHITE">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <Label layoutX="110.0" layoutY="198.0" prefHeight="19.0" prefWidth="70.0" text="Last Name" textFill="WHITE">
+            <Label layoutX="171.0" layoutY="207.0" prefHeight="21.0" prefWidth="73.0" text="Last Name" textFill="WHITE">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <Label layoutX="110.0" layoutY="248.0" prefHeight="19.0" prefWidth="70.0" text="Password" textFill="WHITE">
+            <Label layoutX="171.0" layoutY="257.0" prefHeight="21.0" prefWidth="73.0" text="Password" textFill="WHITE">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
+            <Button id="nextButtonLogin" fx:id="kickButton" layoutX="357.0" layoutY="339.0" mnemonicParsing="false" onAction="#kickButtonClicked" prefHeight="39.0" prefWidth="132.0" style="-fx-background-color: rgb(214, 214, 214);" text="Kick Player">
+               <font>
+                  <Font name="Bookman Old Style Bold" size="14.0" />
+               </font>
+            </Button>
          </children>
       </Pane>
    </children>

@@ -195,12 +195,12 @@ public class gameHistoryController implements Initializable {
             Text t8 = new Text(selectedGame.getEndTime());
             t8.setFont(Font.font("Aldhabi", FontWeight.SEMI_BOLD , 12));
 
-            Text t9 = new Text("\n\nCreator   [Player 1]: ");
+            Text t9 = new Text("\n\n[Creator & Player 1]: ");
             t9.setFont(Font.font("System", FontWeight.BOLD , 15));
             Text t10 = new Text(p1.getUsername());
             t10.setFill(Color.BLUE);
             t10.setFont(Font.font("Aldhabi", FontWeight.SEMI_BOLD , 12));
-            Text t11 = new Text("\n\t\t[Player 2]: ");
+            Text t11 = new Text("\n\t\t  [Player 2]: ");
             t11.setFont(Font.font("System", FontWeight.BOLD , 15));
             Text t12 = new Text(p2.getUsername());
             t12.setFill(Color.BLUE);

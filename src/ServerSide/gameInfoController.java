@@ -46,13 +46,19 @@ public class gameInfoController implements Initializable {
         this.p1 = p1;
         this.p2 = p2;
 
-            if (currentGame.getP2Id().equals("1")) {
-                mode = "Player vs Computer";
-            } else if (currentGame.getP2Id().equals(currentGame.getP1Id())) {
-                mode = "Player vs Player Local";
-            } else {
-                mode = "Player vs Player Online";
-            }
+           try{
+               if (currentGame.getP2Id().equals("1")) {
+                   mode = "Player vs Computer";
+               } else if (currentGame.getP2Id().equals(currentGame.getP1Id())) {
+                   mode = "Player vs Player Local";
+               } else {
+                   mode = "Player vs Player Online";
+               }
+           }
+           catch (NullPointerException e)
+           {
+               mode = "Plater vs Player Online";
+           }
 
             if(currentGame.getStatus().equals("ENDED"))
             {
@@ -160,7 +166,7 @@ public class gameInfoController implements Initializable {
         User winner = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + currentGame.getWinnerId() + "\' ");
 
         Text t1 = new Text("[Game ID]: ");
-        t1.setFont(Font.font("System", FontWeight.BOLD , 15));
+        t1.setFont(Font.font("System", FontWeight.EXTRA_BOLD , 15));
         Text t2 = new Text(currentGame.getGameId());
         t2.setFont(Font.font("Aldhabi", FontWeight.SEMI_BOLD , 13));
         Text t3 = new Text("\n[Game Mode]: ");
@@ -196,7 +202,7 @@ public class gameInfoController implements Initializable {
             t8.setText("TBD");
         }
 
-        Text t9 = new Text("\n\nCreator   [Player 1]: ");
+        Text t9 = new Text("\n\n[Creator & Player 1]: ");
         t9.setFont(Font.font("System", FontWeight.BOLD , 15));
         Text t10 = new Text(p1.getUsername());
         t10.setFill(Color.BLUE);
@@ -209,11 +215,11 @@ public class gameInfoController implements Initializable {
         Text t15 = new Text();
         if(stat.equals(gameStat.WAITING))
         {
-            t11.setText("\n\t\tWaiting For Player 2...");
+            t11.setText("\nWaiting For Player 2...");
         }
         else
         {
-            t11.setText("\n\t\t[Player 2]: ");
+            t11.setText("\n\t\t  [Player 2]: ");
             t11.setFont(Font.font("System", FontWeight.BOLD , 15));
             t12.setText(p2.getUsername());
             t12.setFill(Color.BLUE);

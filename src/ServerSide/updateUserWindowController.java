@@ -1,5 +1,6 @@
 package ServerSide;
 
+import Messages.LogoutMsg;
 import Messages.UpdateUserMsg;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -43,7 +44,10 @@ public class updateUserWindowController implements Initializable {
     @FXML
     private Label errorLabel;
 
-    User user;
+    @FXML
+    private Button kickButton;
+
+    public User user;
 
     void setUserToUpdate(User user)
     {
@@ -90,6 +94,25 @@ public class updateUserWindowController implements Initializable {
     }
 
     @FXML
+    void kickButtonClicked()
+    {
+        Server.getInstance().processMessage(new LogoutMsg(user));
+        Object s = DatabaseManager.getInstance().get(user);
+
+        if(s == null)
+        {
+            errorLabel.setTextFill(Color.LIMEGREEN);
+            errorLabel.setText("User has been kicked");
+        }
+        else
+        {
+            errorLabel.setTextFill(Color.RED);
+            errorLabel.setText("Unable to kick user");
+        }
+
+    }
+
+    @FXML
     void backButtonClicked(ActionEvent event) throws IOException {
         // open modify users window
         Parent modifyUsersRoot = FXMLLoader.load(getClass().getResource("serverModifyUsers.fxml"));
@@ -98,4 +121,5 @@ public class updateUserWindowController implements Initializable {
         window.setScene(modifyUsersScene);
         window.show();
     }
+
 }

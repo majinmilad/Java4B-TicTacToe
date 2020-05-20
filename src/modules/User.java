@@ -14,7 +14,7 @@ public class User extends BaseModel
     private String lastName;
     private String created;
     private String status;
-    private final String userUUID;
+    private String userUUID;
 
     public User()
     {
