@@ -24,7 +24,11 @@ public class User extends BaseModel
     public User(String username)
     {
         this.username = username;
-        userUUID = "";
+
+        if(username.equals("Computer"))
+            userUUID = "1";
+        else
+            userUUID = "";
     }
 
     public User(String username, String password, String firstName, String lastName)

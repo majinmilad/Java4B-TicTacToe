@@ -39,6 +39,9 @@ public class lobbyPvPController implements Initializable {
     @FXML
     private Button backButton;
 
+    @FXML
+    private Button refreshButton;
+
     ListeningClass listener;
 
     @Override
@@ -53,11 +56,6 @@ public class lobbyPvPController implements Initializable {
 
             GameListMsg gameListMsg = (GameListMsg) Global.fromServer.readObject();
 
-            System.out.println("read back from server");
-            if(gameListMsg == null)
-                System.out.println("is null");
-            else
-                System.out.println("not null");
             if(gameListMsg != null)
             {
                 for (GameInfo gameInfo : gameListMsg.getGameList())
@@ -149,6 +147,20 @@ public class lobbyPvPController implements Initializable {
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(mainMenuScene);
         window.show();
+    }
+
+    @FXML
+    void refreshButtonClicked(ActionEvent event)
+    {
+        //request for gameList with waiting games
+        RequestForGamesMsg requestGamesMsg = new RequestForGamesMsg("WAITING");
+
+        try {
+            Global.toServer.writeObject(requestGamesMsg);
+            Global.toServer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**************************************************************************************************/
@@ -264,21 +276,46 @@ public class lobbyPvPController implements Initializable {
                                         Scene boardScene = new Scene(boardParent, 800, 600);
                                         boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
 
-                                        Stage boardWindow = (Stage) backButton.getScene().getWindow();;
+                                        Stage boardWindow = (Stage) backButton.getScene().getWindow();
                                         boardWindow.setScene(boardScene);
                                         boardWindow.show();
 
                                         //shutdown Listener thread in game controller upon exiting the window
+                                        //and notify server that user has left the game
                                         boardWindow.setOnCloseRequest(anonymF ->
                                         {
                                             try {
                                                 //stop the controller's listener
                                                 Global.toServer.writeObject(new KillListenerMsg("for the game window controller exit"));
                                                 Global.toServer.flush();
+
+                                                //notify server user has left the game
+                                                Global.toServer.writeObject(new UserLeftGameMsg(Global.CurrentAccount.getCurrentUser(),
+                                                                            msg.getGameInfo().getGame().getGameId()));
+                                                Global.toServer.flush();
                                             } catch (IOException e) { e.printStackTrace(); }
                                         });
                                     } catch (IOException e) {
                                         e.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+                        else if(serverMsg instanceof GameListMsg) //received because of refresh button action
+                        {
+                            GameListMsg gameListMsg = (GameListMsg) serverMsg;
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //repopulate list of waiting games
+                                    gameList.getItems().clear();
+
+                                    for (GameInfo gameInfo : gameListMsg.getGameList())
+                                    {
+                                        GameInList g = new GameInList();
+                                        g.setGameInfo(gameInfo);
+                                        gameList.getItems().add(g);
                                     }
                                 }
                             });

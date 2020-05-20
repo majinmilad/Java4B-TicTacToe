@@ -1,7 +1,6 @@
 package app;
 
-import Messages.KillListenerMsg;
-import Messages.LogoutMsg;
+import Messages.*;
 import TicTacToe.gameWindowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,10 +8,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import modules.Game;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class mainMenuWindowController {
 
@@ -57,18 +60,68 @@ public class mainMenuWindowController {
     @FXML
     void pvcButtonClicked(ActionEvent event) throws IOException
     {
-        FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
-        Parent boardParent = loader.load();
+        //send game creation request to server
+        NewGameMsg newGameMsg = new NewGameMsg(Global.CurrentAccount.getCurrentUser(), "1");
+        Global.toServer.writeObject(newGameMsg);
+        Global.toServer.flush();
 
-        gameWindowController setController = loader.getController();
-        setController.initializeName("Player 1", "Computer");
+        //open game
+        try {
+            //receive game confirmation from server
+            Object serverMsg = Global.fromServer.readObject();
 
-        Scene boardScene = new Scene(boardParent, 950, 775);
-        boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+            if(serverMsg instanceof GameCreatedMsg)
+            {
+                GameCreatedMsg msg = (GameCreatedMsg) serverMsg;
 
-        Stage boardWindow = new Stage();
-        boardWindow.setScene(boardScene);
-        boardWindow.show();
+                FXMLLoader loader = new FXMLLoader(gameWindowController.class.getResource("gameWindow.fxml"));
+                Parent boardParent = loader.load();
+
+                //set values
+                gameWindowController setController = loader.getController();
+                setController.initializeName(Global.CurrentAccount.getCurrentUser().getUsername(), "Computer");
+                setController.setThisGameID(msg.getGame().getGameId());
+                setController.setItsYourTurn(true); //always human player's turn first
+
+                Scene boardScene = new Scene(boardParent, 800, 600);
+                boardScene.getStylesheets().add(getClass().getResource("/TicTacToe/gameWindow.css").toExternalForm());
+
+                Stage boardWindow = (Stage) pvcButton.getScene().getWindow();
+                boardWindow.setScene(boardScene);
+                boardWindow.show();
+
+                //shutdown Listener thread in game controller upon exiting the window
+                boardWindow.setOnCloseRequest(anonymF ->
+                {
+                    try {
+                        //stop the controller's listener
+                        Global.toServer.writeObject(new KillListenerMsg("for the game window controller exit"));
+                        Global.toServer.flush();
+
+                        //notify server user has left the game
+                        Global.toServer.writeObject(new UserLeftGameMsg(Global.CurrentAccount.getCurrentUser(),
+                                msg.getGame().getGameId()));
+                        Global.toServer.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            else if(serverMsg instanceof UserHasGameOpenMsg)
+            {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "You have a game in progress. Please finish before playing another one.");
+                alert.setTitle("Game in Progress");
+                alert.setHeaderText("User: " + Global.CurrentAccount.getCurrentUser().getUsername());
+                Optional<ButtonType> buttonResult = alert.showAndWait();
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
         /*
         // Create a game request for computer
@@ -105,8 +158,6 @@ public class mainMenuWindowController {
         }
          */
 
-
-    }
 
     @FXML
     void watchGamesButtonClicked(ActionEvent event) throws IOException

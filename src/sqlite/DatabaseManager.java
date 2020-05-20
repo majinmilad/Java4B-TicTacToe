@@ -73,8 +73,8 @@ public class DatabaseManager implements DataSource {
         {
             Game g = (Game) obj;
 
-            qryBuilder.append("Game (p1Id, p2Id, creatorId, gameStatus, UUID) " +
-                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getP2Id() + "\', \'" + g.getCreatorId() + "\', \'WAITING\', \'" + g.getGameId() + "\')");
+            qryBuilder.append("Game (p1Id, p2Id, startTime, creatorId, gameStatus, UUID) " +
+                    "VALUES (\'" + g.getP1Id() + "\', \'" + g.getP2Id() + "\', \'" + g.getStartTime() + "\', \'" + g.getCreatorId() + "\', \'" + g.getStatus() + "\', \'" + g.getGameId() + "\')");
         }
         else if(obj instanceof Move)
         {

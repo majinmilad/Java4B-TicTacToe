@@ -1,7 +1,9 @@
 package TicTacToe;
 
-import Messages.KillListenerMsg;
-import Messages.MoveMadeMsg;
+import Messages.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import modules.Move;
 import app.Global;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -21,14 +23,15 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
-import modules.Move;
+import modules.User;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class gameWindowController implements Initializable {
-
+public class gameWindowController implements Initializable
+{
     private boolean isFirstPlayer = true;
 
     @FXML
@@ -97,6 +100,9 @@ public class gameWindowController implements Initializable {
     @Override
     public void initialize(URL x, ResourceBundle y)
     {
+        backButton.setVisible(false);
+        resetButton.setVisible(false);
+
         setBoard();
 
         listener = new ListeningClass();
@@ -136,20 +142,109 @@ public class gameWindowController implements Initializable {
     }
 
 
+    public void buttonClickHandler(ActionEvent evt) throws IOException
+    {
+        Button clickedButton = (Button) evt.getTarget();
+        String buttonLabel = clickedButton.getText();
+
+        if ("".equals(buttonLabel) && itsYourTurn) //make your move
+        {
+            clickedButton.setText(yourSymbol);
+            clickedButton.setTextFill(Color.DODGERBLUE);
+            itsYourTurn = false;
+            turnPrompt.setText(opponentTurnPrompt);
+            turnNumber++;
+
+            //send move to server
+            Pair<Integer, Integer> pair = getCoord(clickedButton.getId());
+            Move move = new Move(thisGameID, Global.CurrentAccount.getCurrentUser().getUserID(), pair.getKey(), pair.getValue());
+            MoveMadeMsg moveMadeMsg = new MoveMadeMsg(move, Global.CurrentAccount.getCurrentUser());
+            Global.toServer.writeObject(moveMadeMsg);
+            Global.toServer.flush();
+        }
+
+        if("".equals(buttonLabel) && !itsYourTurn && player2Name.getText().equals("Computer") && turnNumber % 2 == 0) //computer will make move after you
+        {
+            turnPrompt.setText(p2TurnPrompt);
+
+            executeComputerMove();
+
+            itsYourTurn = true;
+            turnPrompt.setText(p1TurnPrompt);
+            turnNumber++;
+        }
+
+        //check if move caused a win
+        boolean result = find3InARow();
+
+        if(result && !"Computer".equals(opponentsUsername))
+        {
+            String winner = yourUsername;
+
+            if(yourUsername.equals(player1Name.getText()))
+            {
+                player1Score++;
+                scoreP1.setText(Integer.toString(player1Score));
+            }
+            else
+            {
+                player2Score++;
+                scoreP2.setText(Integer.toString(player2Score));
+            }
+
+            turnPrompt.setText(winner + " WON!");
+            gameBoard.setDisable(true);
+            backButton.setVisible(true);
+
+            GameWonMsg gameWonMsg = new GameWonMsg(thisGameID, Global.CurrentAccount.getCurrentUser());
+            Global.toServer.writeObject(gameWonMsg);
+            Global.toServer.flush();
+        }
+        else if(result) //PvC game won (by minimax computer)
+        {
+            player2Score++;
+            scoreP2.setText(Integer.toString(player2Score));
+
+            turnPrompt.setText("Computer WON!");
+            gameBoard.setDisable(true);
+            backButton.setVisible(true);
+
+            User computer = new User("Computer");
+
+            GameWonMsg gameWonMsg = new GameWonMsg(thisGameID, computer);
+            Global.toServer.writeObject(gameWonMsg);
+            Global.toServer.flush();
+        }
+        else if(!gameBoard.isDisable() && turnNumber > 9) //tie game
+        {
+            tieScore++;
+            scoreTie.setText(Integer.toString(tieScore));
+            disableBoard();
+            isFirstPlayer = true;
+            turnPrompt.setText("Tie Game!");
+            backButton.setVisible(true);
+
+            GameTiedMsg gameTiedMsg = new GameTiedMsg(thisGameID, Global.CurrentAccount.getCurrentUser());
+            Global.toServer.writeObject(gameTiedMsg);
+            Global.toServer.flush();
+        }
+    }
+
+
     // LISTENING THREAD
     class ListeningClass implements Runnable
     {
         Thread thread;
         boolean keepRunning;
 
-        public void start()
+        void start()
         {
             keepRunning = true;
             thread = new Thread(this);
             thread.start();
         }
 
-        public void setStopSignal()
+        void setStopSignal()
         {
             keepRunning = false;
         }
@@ -164,8 +259,6 @@ public class gameWindowController implements Initializable {
                     //receive msg from server
                     Object serverMsg = Global.fromServer.readObject();
 
-                    System.out.println("a message received in game listener");
-
                     if(serverMsg instanceof KillListenerMsg)
                     {
                         setStopSignal();
@@ -173,7 +266,6 @@ public class gameWindowController implements Initializable {
                     else
                     {
                         //perform certain actions on FX application thread
-
                         if(serverMsg instanceof MoveMadeMsg)
                         {
                             MoveMadeMsg moveMadeMsg = (MoveMadeMsg) serverMsg;
@@ -194,6 +286,78 @@ public class gameWindowController implements Initializable {
                                 }
                             });
                         }
+                        else if(serverMsg instanceof GameWonMsg)
+                        {
+                            GameWonMsg gameWonMsg = (GameWonMsg) serverMsg;
+
+                            String winner = gameWonMsg.getGameWinner().getUsername();
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(winner.equals(player1Name.getText()))
+                                    {
+                                        player1Score++;
+                                        scoreP1.setText(Integer.toString(player1Score));
+                                    }
+                                    else
+                                    {
+                                        player2Score++;
+                                        scoreP2.setText(Integer.toString(player2Score));
+                                    }
+
+                                    turnPrompt.setText(winner + " WON!");
+                                    gameBoard.setDisable(true);
+                                    backButton.setVisible(true);
+                                }
+                            });
+                        }
+                        else if(serverMsg instanceof GameTiedMsg)
+                        {
+                            GameTiedMsg gameTiedMsg = (GameTiedMsg) serverMsg;
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tieScore++;
+                                    scoreTie.setText(Integer.toString(tieScore));
+                                    disableBoard();
+                                    turnPrompt.setText("Tie Game!");
+                                    backButton.setVisible(true);
+                                }
+                            });
+                        }
+                        else if(serverMsg instanceof OpponentLeftGameMsg)
+                        {
+                            System.out.println("got it!");
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(yourUsername.equals(player1Name.getText()))
+                                    {
+                                        player1Score++;
+                                        scoreP1.setText(Integer.toString(player1Score));
+                                    }
+                                    else
+                                    {
+                                        player2Score++;
+                                        scoreP2.setText(Integer.toString(player2Score));
+                                    }
+
+                                    turnPrompt.setText(yourUsername + " WON!");
+                                    gameBoard.setDisable(true);
+                                    backButton.setVisible(true);
+
+                                    //display a message
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Your opponent has left the game. You WIN!");
+                                    alert.setTitle("Opponent Left");
+                                    alert.setHeaderText("WINNER");
+                                    Optional<ButtonType> buttonResult = alert.showAndWait();
+                                }
+                            });
+
+                        }
 
                         System.out.println("message processed in game controller listener");
                     }
@@ -207,210 +371,7 @@ public class gameWindowController implements Initializable {
     }
 
 
-    public void buttonClickHandler(ActionEvent evt) throws IOException {
-
-        String winner;
-
-        Button clickedButton = (Button) evt.getTarget();
-        String buttonLabel = clickedButton.getText();
-
-
-        if ("".equals(buttonLabel) && itsYourTurn)
-        {
-            clickedButton.setText(yourSymbol);
-            clickedButton.setTextFill(Color.DODGERBLUE);
-            itsYourTurn = false;
-            turnPrompt.setText(opponentTurnPrompt);
-            turnNumber++;
-
-            //send move to server
-            Pair<Integer, Integer> pair = getCoord(clickedButton.getId());
-            Move move = new Move(thisGameID, Global.CurrentAccount.getCurrentUser().getUserID(), pair.getKey(), pair.getValue());
-            MoveMadeMsg moveMadeMsg = new MoveMadeMsg(move, Global.CurrentAccount.getCurrentUser());
-            Global.toServer.writeObject(moveMadeMsg);
-            Global.toServer.flush();
-        }
-//        else if ("".equals(buttonLabel) && !isFirstPlayer && !player2Name.getText().equals("Computer")) //player 2
-//        {
-//            turnPrompt.setText(p2TurnPrompt);
-//            clickedButton.setText("X");
-//            clickedButton.setTextFill(Color.DARKKHAKI);
-//            isFirstPlayer = true;
-//            turnPrompt.setText(p1TurnPrompt);
-//            turnNumber++;
-//        }
-
-//        if("".equals(buttonLabel) && turnNumber % 2 == 0 && player2Name.getText().equals("Computer")) //computer playing
-//        {
-//            turnPrompt.setText(p2TurnPrompt);
-//
-//            int[][] currentBoard = new int[3][3];
-//
-//            currentBoard[0][0] = stringToInt(b1.getText());
-//            currentBoard[0][1] = stringToInt(b2.getText());
-//            currentBoard[0][2] = stringToInt(b3.getText());
-//            currentBoard[1][0] = stringToInt(b4.getText());
-//            currentBoard[1][1] = stringToInt(b5.getText());
-//            currentBoard[1][2] = stringToInt(b6.getText());
-//            currentBoard[2][0] = stringToInt(b7.getText());
-//            currentBoard[2][1] = stringToInt(b8.getText());
-//            currentBoard[2][2] = stringToInt(b9.getText());
-//
-//            try{
-//                Move newMove = MinimaxMove.createComputerMove(currentBoard);
-//
-//                if(newMove.row == 0 && newMove.col == 0)
-//                {
-//                    b1.setTextFill(Color.DARKKHAKI);
-//                    b1.setText("X");
-//                }
-//                else if(newMove.row == 0 && newMove.col == 1)
-//                {
-//                    b2.setTextFill(Color.DARKKHAKI);
-//                    b2.setText("X");
-//                }
-//                else if(newMove.row == 0 && newMove.col == 2)
-//                {
-//                    b3.setTextFill(Color.DARKKHAKI);
-//                    b3.setText("X");
-//                }
-//                else if(newMove.row == 1 && newMove.col == 0)
-//                {
-//                    b4.setTextFill(Color.DARKKHAKI);
-//                    b4.setText("X");
-//                }
-//                else if(newMove.row == 1 && newMove.col == 1)
-//                {
-//                    b5.setTextFill(Color.DARKKHAKI);
-//                    b5.setText("X");
-//                }
-//                else if(newMove.row == 1 && newMove.col == 2)
-//                {
-//                    b6.setTextFill(Color.DARKKHAKI);
-//                    b6.setText("X");
-//                }
-//                else if(newMove.row == 2 && newMove.col == 0)
-//                {
-//                    b7.setTextFill(Color.DARKKHAKI);
-//                    b7.setText("X");
-//                }
-//                else if(newMove.row == 2 && newMove.col == 1)
-//                {
-//                    b8.setTextFill(Color.DARKKHAKI);
-//                    b8.setText("X");
-//                }
-//                else if(newMove.row == 2 && newMove.col == 2)
-//                {
-//                    b9.setTextFill(Color.DARKKHAKI);
-//                    b9.setText("X");
-//                }
-//
-//                isFirstPlayer = true;
-//                turnPrompt.setText(p1TurnPrompt);
-//                turnNumber++;
-//            }
-//            catch(Exception e)
-//            {
-//                System.out.println(e.getMessage());
-//            }
-//        }
-
-        //check for win
-        boolean result;
-        result = find3InARow();
-
-        if (result == true)
-        {
-            if(!isFirstPlayer)
-            {
-                winner = player1Name.getText() + ' ';
-                player1Score++;
-                scoreP1.setText(Integer.toString(player1Score));
-            }
-            else
-            {
-                winner = player2Name.getText() + ' ';
-                player2Score++;
-                scoreP2.setText(Integer.toString(player2Score));
-            }
-            turnPrompt.setText(winner + " WON!");
-            gameBoard.setDisable(true);
-
-        }
-        else if(gameBoard.isDisable() == false && turnNumber > 9)
-        {
-            tieScore++;
-            scoreTie.setText(Integer.toString(tieScore));
-            disableBoard();
-            isFirstPlayer = true;
-            turnPrompt.setText("Tie Game!");
-        }
-    }
-
-
-    private boolean find3InARow() {
-
-        //Row 1
-        if ("" != b1.getText() && b1.getText() == b2.getText()
-                && b2.getText() == b3.getText()) {
-            disableBoard();
-            highlightWinningCombo(b1, b2, b3);
-            return true;
-        }
-        //Row 2
-        if ("" != b4.getText() && b4.getText() == b5.getText()
-                && b5.getText() == b6.getText()) {
-            disableBoard();
-            highlightWinningCombo(b4, b5, b6);
-            return true;
-        }
-        //Row 3
-        if ("" != b7.getText() && b7.getText() == b8.getText()
-                && b8.getText() == b9.getText()) {
-            disableBoard();
-            highlightWinningCombo(b7, b8, b9);
-            return true;
-        }
-        //Column 1
-        if ("" != b1.getText() && b1.getText() == b4.getText()
-                && b4.getText() == b7.getText()) {
-            disableBoard();
-            highlightWinningCombo(b1, b4, b7);
-            return true;
-        }
-        //Column 2
-        if ("" != b2.getText() && b2.getText() == b5.getText()
-                && b5.getText() == b8.getText()) {
-            disableBoard();
-            highlightWinningCombo(b2, b5, b8);
-            return true;
-        }
-        //Column 3
-        if ("" != b3.getText() && b3.getText() == b6.getText()
-                && b6.getText() == b9.getText()) {
-            disableBoard();
-            highlightWinningCombo(b3, b6, b9);
-            return true;
-        }
-        //Diagonal 1
-        if ("" != b1.getText() && b1.getText() == b5.getText()
-                && b5.getText() == b9.getText()) {
-            disableBoard();
-            highlightWinningCombo(b1, b5, b9);
-            return true;
-        }
-        //Diagonal 2
-        if ("" != b3.getText() && b3.getText() == b5.getText()
-                && b5.getText() == b7.getText()) {
-            disableBoard();
-            highlightWinningCombo(b3, b5, b7);
-            return true;
-        }
-        return false;
-    }
-
-
-    Pair<Integer, Integer> getCoord(String button)
+    private Pair<Integer, Integer> getCoord(String button)
     {
         if(button.equals("b1"))
             return new Pair<>(0,0);
@@ -433,7 +394,7 @@ public class gameWindowController implements Initializable {
         return null;
     }
 
-    public String getButton(Pair<Integer,Integer> pair) {
+    private String getButton(Pair<Integer, Integer> pair) {
         Pair<Integer,Integer> p1 = new Pair<>(0,0);
         Pair<Integer,Integer> p2 = new Pair<>(1,0);
         Pair<Integer,Integer> p3 = new Pair<>(2,0);
@@ -474,7 +435,7 @@ public class gameWindowController implements Initializable {
         return "ERROR";
     }
 
-    void paintButton(String buttonLabel, String symbol)
+    private void paintButton(String buttonLabel, String symbol)
     {
         if(b1.getId().equals(buttonLabel))
         {
@@ -559,12 +520,19 @@ public class gameWindowController implements Initializable {
     @FXML
     void backButtonClicked(ActionEvent event) throws IOException
     {
-        Parent mainMenuWindow = FXMLLoader.load(getClass().getResource("/app/mainMenuWindow.fxml"));
-        Scene mainMenuScene = new Scene(mainMenuWindow);
-        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        window.setScene(mainMenuScene);
-        window.show();
-        resetScore();
+        //stop the controller's listener
+        Global.toServer.writeObject(new KillListenerMsg("from game controller"));
+        Global.toServer.flush();
+
+        while(listener.thread.isAlive()) //wait for listener thread to shutdown
+        {
+            Parent mainMenuWindow = FXMLLoader.load(getClass().getResource("/app/mainMenuWindow.fxml"));
+            Scene mainMenuScene = new Scene(mainMenuWindow);
+            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            window.setScene(mainMenuScene);
+            window.show();
+            resetScore();
+        }
     }
 
     @FXML
@@ -651,6 +619,136 @@ public class gameWindowController implements Initializable {
         applyFadeTransition(first);
         applyFadeTransition(second);
         applyFadeTransition(third);
+    }
+
+    private boolean find3InARow() {
+        //Row 1
+        if ("" != b1.getText() && b1.getText() == b2.getText()
+                && b2.getText() == b3.getText()) {
+            disableBoard();
+            highlightWinningCombo(b1, b2, b3);
+            return true;
+        }
+        //Row 2
+        if ("" != b4.getText() && b4.getText() == b5.getText()
+                && b5.getText() == b6.getText()) {
+            disableBoard();
+            highlightWinningCombo(b4, b5, b6);
+            return true;
+        }
+        //Row 3
+        if ("" != b7.getText() && b7.getText() == b8.getText()
+                && b8.getText() == b9.getText()) {
+            disableBoard();
+            highlightWinningCombo(b7, b8, b9);
+            return true;
+        }
+        //Column 1
+        if ("" != b1.getText() && b1.getText() == b4.getText()
+                && b4.getText() == b7.getText()) {
+            disableBoard();
+            highlightWinningCombo(b1, b4, b7);
+            return true;
+        }
+        //Column 2
+        if ("" != b2.getText() && b2.getText() == b5.getText()
+                && b5.getText() == b8.getText()) {
+            disableBoard();
+            highlightWinningCombo(b2, b5, b8);
+            return true;
+        }
+        //Column 3
+        if ("" != b3.getText() && b3.getText() == b6.getText()
+                && b6.getText() == b9.getText()) {
+            disableBoard();
+            highlightWinningCombo(b3, b6, b9);
+            return true;
+        }
+        //Diagonal 1
+        if ("" != b1.getText() && b1.getText() == b5.getText()
+                && b5.getText() == b9.getText()) {
+            disableBoard();
+            highlightWinningCombo(b1, b5, b9);
+            return true;
+        }
+        //Diagonal 2
+        if ("" != b3.getText() && b3.getText() == b5.getText()
+                && b5.getText() == b7.getText()) {
+            disableBoard();
+            highlightWinningCombo(b3, b5, b7);
+            return true;
+        }
+        return false;
+    }
+
+    private void executeComputerMove()
+    {
+        //translate into 2d board
+        int[][] currentBoard = new int[3][3];
+
+        currentBoard[0][0] = stringToInt(b1.getText());
+        currentBoard[0][1] = stringToInt(b2.getText());
+        currentBoard[0][2] = stringToInt(b3.getText());
+        currentBoard[1][0] = stringToInt(b4.getText());
+        currentBoard[1][1] = stringToInt(b5.getText());
+        currentBoard[1][2] = stringToInt(b6.getText());
+        currentBoard[2][0] = stringToInt(b7.getText());
+        currentBoard[2][1] = stringToInt(b8.getText());
+        currentBoard[2][2] = stringToInt(b9.getText());
+
+        try
+        {
+            MoveCoord computerMove = MinimaxMove.createComputerMove(currentBoard);
+
+            if(computerMove.row == 0 && computerMove.col == 0)
+            {
+                b1.setTextFill(Color.DARKKHAKI);
+                b1.setText("X");
+            }
+            else if(computerMove.row == 0 && computerMove.col == 1)
+            {
+                b2.setTextFill(Color.DARKKHAKI);
+                b2.setText("X");
+            }
+            else if(computerMove.row == 0 && computerMove.col == 2)
+            {
+                b3.setTextFill(Color.DARKKHAKI);
+                b3.setText("X");
+            }
+            else if(computerMove.row == 1 && computerMove.col == 0)
+            {
+                b4.setTextFill(Color.DARKKHAKI);
+                b4.setText("X");
+            }
+            else if(computerMove.row == 1 && computerMove.col == 1)
+            {
+                b5.setTextFill(Color.DARKKHAKI);
+                b5.setText("X");
+            }
+            else if(computerMove.row == 1 && computerMove.col == 2)
+            {
+                b6.setTextFill(Color.DARKKHAKI);
+                b6.setText("X");
+            }
+            else if(computerMove.row == 2 && computerMove.col == 0)
+            {
+                b7.setTextFill(Color.DARKKHAKI);
+                b7.setText("X");
+            }
+            else if(computerMove.row == 2 && computerMove.col == 1)
+            {
+                b8.setTextFill(Color.DARKKHAKI);
+                b8.setText("X");
+            }
+            else if(computerMove.row == 2 && computerMove.col == 2)
+            {
+                b9.setTextFill(Color.DARKKHAKI);
+                b9.setText("X");
+            }
+        }
+        catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 }

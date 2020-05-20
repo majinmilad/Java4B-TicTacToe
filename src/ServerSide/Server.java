@@ -367,9 +367,11 @@ public class Server extends Observable implements Runnable
                             {
                                 //set up player vs computer game
                                 newGame.setStatus("RUNNING");
+                                newGame.setStartTime();
                                 Object successfulInsert = DatabaseManager.getInstance().insert(newGame);
                                 if(successfulInsert != null)
                                 {
+                                    newGame.displayAll();
                                     GameCreatedMsg compGame = new GameCreatedMsg(newGame, client.clientsUserName);
                                     client.objectOutputToClient.writeObject(compGame);
                                 }
@@ -434,7 +436,11 @@ public class Server extends Observable implements Runnable
                         JoinGameRequestMsg joinGameMsg = (JoinGameRequestMsg) nextMsg;
 
                         //check if game still in WAITING mode
-                        Game game = (Game) DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + joinGameMsg.getGameInfo().getGame().getP1Id() + "\' AND gameStatus = \'WAITING\'");
+                        Game game = (Game) DatabaseManager.getInstance().query(new Game(),
+                                "WHERE p1Id = \'" + joinGameMsg.getGameInfo().getGame().getP1Id()
+                                        + "\' AND UUID = \'" + joinGameMsg.getGameInfo().getGame().getGameId()
+                                        + "\' AND gameStatus = \'WAITING\'");
+
                         if(game != null)
                         {
                             User gameCreator = (User) DatabaseManager.getInstance().get(new User(joinGameMsg.getGameInfo().getPlayer1Username()));
@@ -451,6 +457,11 @@ public class Server extends Observable implements Runnable
                                 //send to second player
                                 client.objectOutputToClient.writeObject(gameStartingMsg);
                                 client.objectOutputToClient.flush();
+
+                                //delete if joining player had a WAITING game
+                                Object waitingGame = DatabaseManager.getInstance().query(new Game(), "WHERE p1Id = \'" + gameStartingMsg.getJoiningGamePlayer().getUserID() + "\' AND gameStatus = \'WAITING\'");
+                                if(waitingGame != null)
+                                    DatabaseManager.getInstance().delete((Game) waitingGame);
 
                                 //set game's player2Id, startTime, and its status to RUNNING
                                 game.setP2Id(joinGameMsg.getRequestingUser().getUserID());
@@ -469,20 +480,116 @@ public class Server extends Observable implements Runnable
                     else if(nextMsg instanceof MoveMadeMsg)
                     {
                         MoveMadeMsg moveMsg = (MoveMadeMsg) nextMsg;
+
                         //write to db
-                        Object successfulInsert = DatabaseManager.getInstance().insert(moveMsg.getMove());
+                        Object successfulMoveInsert = DatabaseManager.getInstance().insert(moveMsg.getMove());
+
                         //propagate move
-                        if(successfulInsert != null)
+                        if(successfulMoveInsert != null)
                         {
                             Game game = (Game) DatabaseManager.getInstance().query(new Game(), "WHERE UUID = \'" + moveMsg.getMove().getGameId() + "\' AND gameStatus = \'RUNNING\'");
 
                             //send move to other player
-                            if(moveMsg.getMoveMadeByUser().getUserID().equals(game.getP1Id()))
-                                clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.writeObject(moveMsg);
-                            else
-                                clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.writeObject(moveMsg);
+                            if(!game.getP2Id().equals("1")) // not a PvC game
+                            {
+                                if (moveMsg.getMoveMadeByUser().getUserID().equals(game.getP1Id())) {
+                                    clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.writeObject(moveMsg);
+                                    clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.flush();
+                                } else {
+                                    clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.writeObject(moveMsg);
+                                    clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.flush();
+                                }
+                            }
+
+                            //send to viewers
                         }
                     }
+                    else if(nextMsg instanceof GameWonMsg)
+                    {
+                        GameWonMsg gameWonMsg = (GameWonMsg) nextMsg;
+                        Game game = (Game) DatabaseManager.getInstance().query(new Game(), "WHERE UUID = \'" + gameWonMsg.getGameId() + "\' AND gameStatus = \'RUNNING\'");
+
+                        //update game record
+                        game.setWinnerId(gameWonMsg.getGameWinner().getUserID());
+                        game.setEndTime();
+                        game.setStatus("ENDED");
+                        DatabaseManager.getInstance().update(game);
+
+                        //send win msg to other player
+                        if(!game.getP2Id().equals("1")) // not a PvC game
+                        {
+                            if (gameWonMsg.getGameWinner().getUserID().equals(game.getP1Id())) {
+                                clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.writeObject(gameWonMsg);
+                                clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.flush();
+                            } else {
+                                clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.writeObject(gameWonMsg);
+                                clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.flush();
+                            }
+                        }
+
+                        //send to viewers
+                    }
+                    else if(nextMsg instanceof GameTiedMsg)
+                    {
+                        GameTiedMsg gameTiedMsg = (GameTiedMsg) nextMsg;
+                        Game game = (Game) DatabaseManager.getInstance().query(new Game(), "WHERE UUID = \'" + gameTiedMsg.getGameId() + "\' AND gameStatus = \'RUNNING\'");
+
+                        //update game record
+                        game.setWinnerId("0");
+                        game.setEndTime();
+                        game.setStatus("ENDED");
+                        DatabaseManager.getInstance().update(game);
+
+                        //send tie msg to other player
+                        if(!game.getP2Id().equals("1")) // not a PvC game
+                        {
+                            if (gameTiedMsg.getMsgSender().getUserID().equals(game.getP1Id())) {
+                                clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.writeObject(gameTiedMsg);
+                                clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.flush();
+                            } else {
+                                clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.writeObject(gameTiedMsg);
+                                clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.flush();
+                            }
+                        }
+
+                        //send to viewers
+                    }
+                    else if(nextMsg instanceof UserLeftGameMsg)
+                    {
+                        UserLeftGameMsg userLeftGameMsg = (UserLeftGameMsg) nextMsg;
+
+                        Game game = (Game) DatabaseManager.getInstance().query(new Game(), "WHERE UUID = \'" + userLeftGameMsg.getGameId() + "\' AND gameStatus = \'RUNNING\'");
+
+                        if(game != null)
+                        {
+                            if(!game.getP2Id().equals("1")) //PvP game
+                            {
+                                String leavingPlayerId = userLeftGameMsg.getUser().getUserID();
+
+                                //award leaving player a loss
+                                //and notify other player of their win
+                                if (leavingPlayerId.equals(game.getP1Id())) {
+                                    game.setWinnerId(game.getP2Id());
+                                    clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.writeObject(new OpponentLeftGameMsg());
+                                    clientMapPlayerId.get(game.getP2Id()).objectOutputToClient.flush();
+
+                                } else {
+                                    game.setWinnerId(game.getP1Id());
+                                    clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.writeObject(new OpponentLeftGameMsg());
+                                    clientMapPlayerId.get(game.getP1Id()).objectOutputToClient.flush();
+                                }
+                            }
+                            else
+                                game.setWinnerId("1");
+
+                            game.setEndTime();
+                            game.setStatus("ENDED");
+                            DatabaseManager.getInstance().update(game);
+                        }
+                    }
+
+
+
 //                    else if(nextMsg instanceof ViewGameMsg)
 //                    {
 //
