@@ -128,6 +128,14 @@ public class DatabaseManager implements DataSource {
                     "SET startTime = \'"+ g.getStartTime() + "\',  p2Id = \'" + g.getP2Id() +"\', winnerId = \'" + g.getWinnerId() + "\', " +
                     "endTime = \'" + g.getEndTime() +"\', gameStatus = \'" + g.getStatus() + "\' " + "WHERE UUID = \'" + g.getGameId() + "\'");
         }
+        else if(obj instanceof GameViewers)
+        {
+            GameViewers gv = (GameViewers) obj;
+
+            qryBuilder.append("GameViewers" +
+                              "SET viewingStatus = \'" + gv.getStatus() + "\' " +
+                              "WHERE gameId == \'" + gv.getId() + "\'");
+        }
 
 
         try {
@@ -313,11 +321,36 @@ public class DatabaseManager implements DataSource {
 
                 System.out.println("Successful Game query\n");
                 return game;
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
                 System.out.println("Unsuccessful Game query");
                 e.printStackTrace();
                 return null;
             }
+
+        }
+        else if(obj instanceof GameViewers)
+        {
+            GameViewers gv = (GameViewers) obj;
+            qryBuilder.append("* From GameViewers " + filter + " LIMIT 1");
+
+            try {
+                ResultSet rs = executeQuery(qryBuilder.toString());
+                rs.next();
+
+                GameViewers gameviewer = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"),
+                        rs.getString("viewingStatus"));
+
+                System.out.println("Successful GameViewer query");
+
+                return gameviewer;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Unsuccessful User query");
+                return null;
+            }
+
         }
 
         return null; //temp
@@ -409,7 +442,7 @@ public class DatabaseManager implements DataSource {
 
                 while(rs.next())
                 {
-                    GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
+                    GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"), rs.getString("gameStatus"));
                     list.add(gameViewers);
                 }
 

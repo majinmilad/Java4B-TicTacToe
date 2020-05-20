@@ -60,7 +60,7 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <Label alignment="BOTTOM_CENTER" layoutX="13.0" layoutY="367.0" prefHeight="8.0" prefWidth="288.0" text="ID: e4700134-6048-47c5-9466-037c1ed6f893" textFill="#ffffff00">
+      <Label fx:id="currentGameID" alignment="BOTTOM_CENTER" layoutX="13.0" layoutY="367.0" prefHeight="8.0" prefWidth="288.0" text="ID: e4700134-6048-47c5-9466-037c1ed6f893" textFill="#ffffff00">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>

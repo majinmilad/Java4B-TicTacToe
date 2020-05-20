@@ -64,6 +64,9 @@ public class viewPlayerController{
     @FXML
     private TabPane tPane;
 
+    @FXML
+    private Label currentGameID;
+
     private ArrayList<BaseModel> gameHistory;
 
     private User currentUser;
@@ -115,6 +118,25 @@ public class viewPlayerController{
         currentStat.setText(currentUser.getStatus());
         pUsername.setText(currentUser.getUsername());
         pId.setText(currentUser.getUserID());
+
+        // If player is playing game, find a game w/ p1 or p2 == playerid && end time == null;
+        // If player is viewing game, check gameviewer if player is viewing
+
+        Object s = DatabaseManager.getInstance().query(new Game(), "WHERE (p1Id == \'" +  currentUser.getUserID()  + "\' "
+                + "OR p2Id == \'" +  currentUser.getUserID()  + "\') AND gameStatus == 'RUNNING' ");
+
+        if(s != null)
+        {
+            currentGameID.setText(((Game)s).getGameId());
+        }
+        else
+        {
+            currentGameID.setText("");
+        }
+
+        s = DatabaseManager.getInstance().query(new GameViewers(), "WHERE viewerId == \'" + currentUser.getUserID() + "\' " +
+                                                "AND viewingStatus == 'VIEWING' ");
+
     }
 
     public void initUser(User user)
@@ -178,16 +200,16 @@ public class viewPlayerController{
 
     private void getWLT()
     {
-        List<BaseModel> countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND gameStatus == 'ENDED' AND winnerId == \'" + currentUser.getUserID() + "\' ");
+        List<BaseModel> countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE gameStatus == 'ENDED' AND winnerId == \'" + currentUser.getUserID() + "\' ");
 
         wScore.setText(Integer.toString(countList.size()));
 
-        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND (p1Id == \'" +  currentUser.getUserID()  + "\' "
+        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE (p1Id == \'" +  currentUser.getUserID()  + "\' "
                 + "OR p2Id == \'" +  currentUser.getUserID()  + "\') AND gameStatus == 'ENDED' AND winnerId == '0' ");
 
         tScore.setText(Integer.toString(countList.size()));
 
-        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND (p1Id = \'" +  currentUser.getUserID()  + "\' "
+        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE (p1Id = \'" +  currentUser.getUserID()  + "\' "
                 + "OR p2Id = \'" +  currentUser.getUserID()  + "\') AND gameStatus == 'ENDED' AND winnerId != '0' AND winnerId != \'" + currentUser.getUserID() + "\' ");
 
         lScore.setText(Integer.toString(countList.size()));
@@ -263,7 +285,7 @@ public class viewPlayerController{
 //                    + "\nPlayer 2: " + p2.getUsername() + " " + p2.getUserID()
 //                    + "\nWinner: " + winner.getUsername() + " " + winner.getUserID() + "\n\nViewers:\n");
 
-            viewers = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new GameViewers(selectedGame.getGameId(), ""), "");
+            viewers = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new GameViewers(selectedGame.getGameId(), "", ""), "");
             if (viewers.size() > 0) {
                 User temp = new User();
                 for (BaseModel element : viewers) {
