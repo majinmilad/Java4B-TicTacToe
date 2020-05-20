@@ -13,7 +13,7 @@ public class Move extends BaseModel
     private int Ycoord;
     private String time;
 
-    Move()
+    public Move()
     {
 
     }

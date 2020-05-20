@@ -5,7 +5,6 @@ import modules.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
-import java.util.UUID;
 
 public class DatabaseManager implements DataSource {
     private static DatabaseManager instance = null;
@@ -19,7 +18,7 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\Phillip\\Documents\\GitHub\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
             // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\Java4B-TicTacToe\Database\TicTacToeDB.db
             // Phill: Database/TicTacToeDB.db
             // Kenny:
@@ -81,11 +80,9 @@ public class DatabaseManager implements DataSource {
         {
             Move m = (Move) obj;
 
-            UUID uniqueId = UUID.randomUUID();
-
-            qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time,UUID) " +
-                    "VALUES (\'" + m.getGameId() +  "\', \'" + m.getId() + "\', " + m.getXcoord()
-                    + ", " + m.getYcoord() + ", \'" + m.getTime() + "\', \'" + uniqueId + "\')");
+            qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time) " +
+                    "VALUES ( " + m.getGameId() +  ", " + m.getId() + ", " + m.getXcoord()
+                    + ", " + m.getYcoord() + ", \'" + m.getTime() + "\')" );
         }
         else if(obj instanceof GameViewers)
         {
@@ -233,7 +230,7 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof Game)
         {
 //            Game g = (Game) obj;
-//            qryBuilder.append("FROM Game " + "WHERE UUID = \'" + g.getGameId() + "\'" );
+//            qryBuilder.append("FROM Game " + "WHERE id = \'" + g.getId() + "\'" );
 //
 //            try {
 //                ResultSet rs = executeQuery(qryBuilder.toString());
@@ -286,13 +283,33 @@ public class DatabaseManager implements DataSource {
         {
             qryBuilder.append("* FROM Game " + filter + " LIMIT 1");
 
+            /*
+                    @ To get game history
+                    "WHERE p1Id = \'" +  playerID  + "\' "
+                   + OR p2Id = \'" +  playerID + "\' "
+
+                    @ To Get Active Games
+                    "WHERE endTime != NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To Get Completed Games
+                    "WHERE endTime = NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To See if Player is playing
+                     "WHERE p1Id = \'" +  playerID  + "\' "
+                   + "OR p2Id = \'" +  playerID + "\' "
+                   + "AND endTime != NULL "
+             */
+
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
 
                 Game game = new Game(rs.getString("p1Id"), rs.getString("p2Id"),
                         rs.getString("startTime"), rs.getString("endTime"),
                         rs.getString("creatorId"), rs.getString("winnerId"),
-                        rs.getString("UUID"));
+                        rs.getString("gameStatus"), rs.getString("UUID"));
+
 
                 System.out.println("Successful Game query\n");
                 return game;
@@ -313,11 +330,11 @@ public class DatabaseManager implements DataSource {
         List <BaseModel> list = new ArrayList<>();
 
         StringBuilder qryBuilder = new StringBuilder();
-        qryBuilder.append("SELECT * ");
+        qryBuilder.append("SELECT ");
 
         if(obj instanceof User)
         {
-            qryBuilder.append("FROM User WHERE userID > 1 " +  filter);
+            qryBuilder.append("* FROM User WHERE userID > 1 " +  filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
@@ -339,7 +356,7 @@ public class DatabaseManager implements DataSource {
         }
         else if (obj instanceof Game)
         {
-            qryBuilder.append("FROM Game WHERE p2Id != 1 " + filter);
+            qryBuilder.append("* FROM Game " + filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
@@ -349,7 +366,7 @@ public class DatabaseManager implements DataSource {
                     Game g = new Game(rs.getString("p1Id"), rs.getString("p2Id"),
                             rs.getString("startTime"), rs.getString("endTime"),
                             rs.getString("creatorId"), rs.getString("winnerId"),
-                            rs.getString("UUID"));
+                            rs.getString("gameStatus"), rs.getString("UUID"));
 
                     list.add(g);
                 }
@@ -363,9 +380,7 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof Move)
         {
             Move moves = (Move) obj;
-            qryBuilder.append("FROM Moves "
-                    +  "WHERE gameId = \'" + moves.getGameId() + "\' "
-                    +  "ORDER BY time ASC;");
+            qryBuilder.append("* FROM Moves " + filter );
 
             try {
                 ResultSet   rs = executeQuery(qryBuilder.toString());
@@ -386,8 +401,8 @@ public class DatabaseManager implements DataSource {
         {
             GameViewers gv = (GameViewers) obj;
 
-            qryBuilder.append("FROM GameViewers " +
-                    "WHERE viewerId = \'" + gv.getId() + "\' " );
+            qryBuilder.append("DISTINCT * FROM GameViewers " +
+                    "WHERE gameId = \'" + gv.getId() + "\' " );
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());

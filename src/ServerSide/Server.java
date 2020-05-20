@@ -388,11 +388,11 @@ public class Server extends Observable implements Runnable
 
                         if(requestGamesMsg.getGameStatusFilter() == null)
                         {
-                            gameList = DatabaseManager.getInstance().queryList(new Game(), "");
+                            gameList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 ");
                         }
                         else
                         {
-                            gameList = DatabaseManager.getInstance().queryList(new Game(), "AND gameStatus = \'" + requestGamesMsg.getGameStatusFilter() + "\'");
+                            gameList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND gameStatus = \'" + requestGamesMsg.getGameStatusFilter() + "\'");
                         }
 
                         //convert list of games into list of gameInfo objects
