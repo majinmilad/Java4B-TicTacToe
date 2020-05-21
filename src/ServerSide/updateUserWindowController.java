@@ -55,6 +55,10 @@ public class updateUserWindowController implements Initializable {
     {
         this.user = user;
 
+        if(user.getStatus().equals("OFFLINE"))
+        {
+            kickButton.setDisable(true);
+        }
         username.setText(user.getUsername());
         firstName.setText(user.getFirstName());
         lastName.setText(user.getLastName());
@@ -99,17 +103,18 @@ public class updateUserWindowController implements Initializable {
     void kickButtonClicked()
     {
         Server.getInstance().processMessage(new LogoutMsg(user));
-        Game s = (Game) DatabaseManager.getInstance().get(user);
+        User s = (User) DatabaseManager.getInstance().get(user);
 
-        if(s.getStatus().equalsIgnoreCase("OFFLINE"))
+        if(s.getStatus().equals("OFFLINE"))
         {
             errorLabel.setTextFill(Color.LIMEGREEN);
             errorLabel.setText("User has been kicked");
+            kickButton.setDisable(true);
         }
         else
         {
-            errorLabel.setTextFill(Color.RED);
-            errorLabel.setText("Unable to kick user");
+//            errorLabel.setTextFill(Color.RED);
+//            errorLabel.setText("Unable to kick user");
         }
 
     }

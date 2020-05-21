@@ -43,7 +43,7 @@ public class movesWindowController{
 
         for (BaseModel m : moves)
         {
-            if(((Move)m).getId() == p1Id)
+            if(((Move)m).getPlayerId().equals(p1Id))
             {
                 currentPlayer = p1.getUsername();
             }
@@ -59,19 +59,17 @@ public class movesWindowController{
 
         Text t = new Text();
 
-        if(game.getWinnerId().equals('0'))
-        {
-            t.setText("Game Ended in Tie");
-        }
-        else if (game.getWinnerId().equals(p1Id))
-        {
+        if (game.getWinnerId().equals(p1.getUserID())) {
             t.setText("Player: " + p1.getUsername() + "\twon the game!");
+            t.setFill(Color.GREEN);
+        } else if (game.getWinnerId().equals(p2.getUserID())) {
+            t.setText("Player: " + p2.getUsername() + "\twon the game!");
             t.setFill(Color.GREEN);
         }
         else
         {
-            t.setText("Player: " +  p2.getUsername() + "\twon the game!");
-            t.setFill(Color.GREEN);
+            t.setText("Game Ended in Tie");
+            t.setFill(Color.BLUE);
         }
 
         movesScreen.getChildren().add(t);

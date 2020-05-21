@@ -121,7 +121,7 @@ public class gameHistoryController implements Initializable {
 
     public void getGames()
     {
-        gameHistory = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND (p1Id == \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\' "
+        gameHistory = (ArrayList<BaseModel>) DatabaseManager.getInstance().queryList(new Game(), "WHERE (p1Id == \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\' "
                 + "OR p2Id == \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\') AND gameStatus == 'ENDED' ");
 
         for(BaseModel b: gameHistory)
@@ -138,16 +138,16 @@ public class gameHistoryController implements Initializable {
 
     private void getWLT()
     {
-        List<BaseModel> countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND gameStatus == 'ENDED' AND winnerId == \'" + Global.CurrentAccount.getCurrentUser().getUserID() + "\' ");
+        List<BaseModel> countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE gameStatus == 'ENDED' AND winnerId == \'" + Global.CurrentAccount.getCurrentUser().getUserID() + "\' ");
 
         winScore.setText(Integer.toString(countList.size()));
 
-        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND (p1Id == \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\' "
+        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE (p1Id == \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\' "
                 + "OR p2Id == \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\') AND gameStatus == 'ENDED' AND winnerId == '0' ");
 
         tieScore.setText(Integer.toString(countList.size()));
 
-        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND (p1Id = \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\' "
+        countList = DatabaseManager.getInstance().queryList(new Game(), "WHERE (p1Id = \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\' "
                 + "OR p2Id = \'" +  Global.CurrentAccount.getCurrentUser().getUserID()  + "\') AND gameStatus == 'ENDED' AND winnerId != '0' AND winnerId != \'" + Global.CurrentAccount.getCurrentUser().getUserID() + "\' ");
 
         lossScore.setText(Integer.toString(countList.size()));
@@ -165,7 +165,6 @@ public class gameHistoryController implements Initializable {
 
             User p1 = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + selectedGame.getP1Id() + "\' ");
             User p2 = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + selectedGame.getP2Id() + "\' ");
-            User winner = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + selectedGame.getWinnerId() + "\' ");
 
             String mode;
             if (selectedGame.getP2Id().equals("1")) {
@@ -208,8 +207,22 @@ public class gameHistoryController implements Initializable {
 
             Text t13 = new Text("\n\n[Winner]:  ");
             t13.setFont(Font.font("System", FontWeight.BOLD , 15));
-            Text t14 = new Text(winner.getUsername());
-            t14.setFill(Color.GREEN);
+            Text t14 = new Text();
+            if(selectedGame.getWinnerId().equals(p1.getUserID()))
+            {
+                t14.setText(p1.getUsername());
+                t14.setFill(Color.GREEN);
+            }
+            else if (selectedGame.getWinnerId().equals(p2.getUserID()))
+            {
+                t14.setText(p2.getUsername());
+                t14.setFill(Color.GREEN);
+            }
+            else
+            {
+                t14.setText("TIE GAME");
+                t14.setFill(Color.BLUE);
+            }
             t14.setFont(Font.font("Aldhabi", FontWeight.SEMI_BOLD , 12));
             Text t15 = new Text("\n\n[Viewers]: ");
             t15.setFont(Font.font("System", FontWeight.BOLD , 15));

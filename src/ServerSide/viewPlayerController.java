@@ -84,7 +84,7 @@ public class viewPlayerController{
             String currentPlayer;
 
             for (BaseModel m : moves) {
-                if (((Move) m).getId() == p1.getUserID()) {
+                if (((Move) m).getPlayerId().equals(p1.getUserID())) {
                     currentPlayer = p1.getUsername();
                 } else {
                     currentPlayer = p2.getUsername();
@@ -97,14 +97,17 @@ public class viewPlayerController{
 
             Text t = new Text();
 
-            if (game.getWinnerId().equals('0')) {
-                t.setText("Game Ended in Tie");
-            } else if (game.getWinnerId().equals(p1.getUserID())) {
+            if (game.getWinnerId().equals(p1.getUserID())) {
                 t.setText("Player: " + p1.getUsername() + "\twon the game!");
                 t.setFill(Color.GREEN);
-            } else {
+            } else if (game.getWinnerId().equals(p2.getUserID())) {
                 t.setText("Player: " + p2.getUsername() + "\twon the game!");
                 t.setFill(Color.GREEN);
+            }
+            else
+            {
+                t.setText("Game Ended in Tie");
+                t.setFill(Color.BLUE);
             }
 
             moveBox.getChildren().add(t);
@@ -228,7 +231,7 @@ public class viewPlayerController{
 
             User p1 = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + selectedGame.getP1Id() + "\' ");
             User p2 = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + selectedGame.getP2Id() + "\' ");
-            User winner = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + selectedGame.getWinnerId() + "\' ");
+
 
             String mode;
             if (selectedGame.getP2Id().equals("1")) {
@@ -271,8 +274,24 @@ public class viewPlayerController{
 
             Text t13 = new Text("\n\n[Winner]:  ");
             t13.setFont(Font.font("System", FontWeight.BOLD , 15));
-            Text t14 = new Text(winner.getUsername());
-            t14.setFill(Color.GREEN);
+
+            Text t14 = new Text();
+            if(selectedGame.getWinnerId().equals(p1.getUserID()))
+            {
+                t14.setText(p1.getUsername());
+                t14.setFill(Color.GREEN);
+            }
+            else if (selectedGame.getWinnerId().equals(p2.getUserID()))
+            {
+                t14.setText(p2.getUsername());
+                t14.setFill(Color.GREEN);
+            }
+            else
+            {
+                t14.setText("TIE GAME");
+                t14.setFill(Color.BLUE);
+            }
+
             t14.setFont(Font.font("Aldhabi", FontWeight.SEMI_BOLD , 13));
             Text t15 = new Text("\n\n[Viewers]: ");
             t15.setFont(Font.font("System", FontWeight.BOLD , 15));

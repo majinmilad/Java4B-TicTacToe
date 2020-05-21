@@ -25,6 +25,7 @@ public class Move extends BaseModel
         setXcoord(X);
         setYcoord(Y);
         setInitialTime();
+        this.playerId = playerId;
     }
 
     public Move(String gameId, String playerId, int X, int Y, String time)
@@ -34,6 +35,7 @@ public class Move extends BaseModel
         setXcoord(X);
         setYcoord(Y);
         setRetrievedTime(time);
+        this.playerId = playerId;
     }
 
 

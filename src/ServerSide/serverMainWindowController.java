@@ -63,6 +63,9 @@ public class serverMainWindowController implements Observer, Initializable {
     @FXML
     private TabPane tabP;
 
+    @FXML
+    private Button updateGamesButton;
+
     public ObservableList<Game> list = FXCollections.observableArrayList();
 
 
@@ -185,6 +188,16 @@ public class serverMainWindowController implements Observer, Initializable {
         Stage gameInfoStage = new Stage();
         gameInfoStage.setScene(gameInfoScene);
         gameInfoStage.show();
+    }
+
+    @FXML
+    void updateGamesButtonClicked()
+    {
+        gameInformationButton.setDisable(true);
+        gameList.getItems().clear();
+        setColumns();
+        colorColumns();
+        gameList.setItems(list);
     }
 
     @Override

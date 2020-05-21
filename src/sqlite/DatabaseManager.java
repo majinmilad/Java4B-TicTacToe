@@ -84,7 +84,7 @@ public class DatabaseManager implements DataSource {
             UUID uniqueId = UUID.randomUUID();
 
             qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time,UUID) " +
-                    "VALUES (\'" + m.getGameId() +  "\', \'" + m.getId() + "\', " + m.getXcoord()
+                    "VALUES (\'" + m.getGameId() +  "\', \'" + m.getPlayerId() + "\', " + m.getXcoord()
                     + ", " + m.getYcoord() + ", \'" + m.getTime() + "\', \'" + uniqueId + "\')");
         }
         else if(obj instanceof GameViewers)
