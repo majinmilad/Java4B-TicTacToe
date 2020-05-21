@@ -451,6 +451,8 @@ public class Server extends Observable implements Runnable
                                 //start the game
                                 GameStartingMsg gameStartingMsg = new GameStartingMsg(joinGameMsg.getGameInfo(), gameCreator, joinGameMsg.getRequestingUser());
 
+                                sendToServerGUI(joinGameMsg);
+
                                 //send to game creator
                                 clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.writeObject(gameStartingMsg);
                                 clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.flush();
@@ -472,8 +474,6 @@ public class Server extends Observable implements Runnable
                                 DatabaseManager.getInstance().update(game);
                             }
                         }
-
-                        sendToServerGUI(joinGameMsg);
                     }
                     else if(nextMsg instanceof KillListenerMsg)
                     {
