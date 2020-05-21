@@ -106,7 +106,7 @@ public class gameInfoController implements Initializable {
 
         for (BaseModel m : moves)
         {
-            if(((Move)m).getId() == p1.getUserID())
+            if(((Move)m).getPlayerId().equals(p1.getUserID()))
             {
                 currentPlayer = p1.getUsername();
             }
@@ -120,11 +120,7 @@ public class gameInfoController implements Initializable {
 
         Text t = new Text();
 
-        if(currentGame.getWinnerId().equals('0'))
-        {
-            t.setText("Game Ended in Tie");
-        }
-        else if (currentGame.getWinnerId().equals(p1.getUserID()))
+        if (currentGame.getWinnerId().equals(p1.getUserID()))
         {
             t.setText("Player: " + p1.getUsername() + "\twon the game!");
             t.setFill(Color.GREEN);
@@ -133,6 +129,11 @@ public class gameInfoController implements Initializable {
         {
             t.setText("Player: " +  p2.getUsername() + "\twon the game!");
             t.setFill(Color.GREEN);
+        }
+        else
+        {
+            t.setText("Game Ended in Tie");
+            t.setFill(Color.BLUE);
         }
 
         movesBox.getChildren().add(t);
@@ -163,7 +164,6 @@ public class gameInfoController implements Initializable {
 
     public void getGameDetials(gameStat stat)
     {
-        User winner = (User) DatabaseManager.getInstance().query(new User(), "WHERE UUID = \'" + currentGame.getWinnerId() + "\' ");
 
         Text t1 = new Text("[Game ID]: ");
         t1.setFont(Font.font("System", FontWeight.EXTRA_BOLD , 15));
@@ -234,8 +234,21 @@ public class gameInfoController implements Initializable {
             }
             else
             {
-                t14.setText(winner.getUsername());
-                t14.setFill(Color.GREEN);
+                if(currentGame.getWinnerId().equals(p1.getUserID()))
+                {
+                    t14.setText(p1.getUsername());
+                    t14.setFill(Color.GREEN);
+                }
+                else if (currentGame.getWinnerId().equals(p2.getUserID()))
+                {
+                    t14.setText(p2.getUsername());
+                    t14.setFill(Color.GREEN);
+                }
+                else
+                {
+                    t14.setText("TIE GAME");
+                    t14.setFill(Color.BLUE);
+                }
             }
             t14.setFont(Font.font("Aldhabi", FontWeight.SEMI_BOLD , 13));
 

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="586.0" prefWidth="920.0" style="-fx-background-color: linear-gradient(to top, #1D4350,  #A43931);" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.gameHistoryController">
+   <children>
+      <Button id="nextButtonLogin" fx:id="backButton" layoutX="23.0" layoutY="532.0" mnemonicParsing="false" onAction="#backButtonClicked" prefHeight="39.0" prefWidth="97.0" style="-fx-background-color: rgb(214, 214, 214);" text="Back">
+         <font>
+            <Font name="Bookman Old Style Bold" size="14.0" />
+         </font>
+      </Button>
+      <Label alignment="CENTER" layoutX="298.0" layoutY="14.0" prefHeight="56.0" prefWidth="323.0" text="Game History" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="39.0" />
+         </font>
+      </Label>
+      <VBox layoutX="-47.0" layoutY="58.0" prefHeight="470.0" prefWidth="237.0">
+         <children>
+            <Label alignment="BOTTOM_CENTER" contentDisplay="CENTER" prefHeight="148.0" prefWidth="238.0" text="Wins" textAlignment="CENTER" textFill="WHITE" underline="true">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="winScore" alignment="TOP_CENTER" contentDisplay="CENTER" prefHeight="51.0" prefWidth="238.0" text="0" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label alignment="BOTTOM_CENTER" prefHeight="42.0" prefWidth="238.0" text="Losses" textFill="WHITE" underline="true">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lossScore" alignment="TOP_CENTER" prefHeight="51.0" prefWidth="238.0" text="0" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label alignment="BOTTOM_CENTER" prefHeight="42.0" prefWidth="238.0" text="Ties" textFill="WHITE" underline="true">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="tieScore" alignment="TOP_CENTER" prefHeight="51.0" prefWidth="248.0" text="0" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <Button id="nextButtonLogin" fx:id="movesButton" layoutX="634.0" layoutY="510.0" mnemonicParsing="false" onAction="#movesButtonClicked" prefHeight="39.0" prefWidth="97.0" style="-fx-background-color: rgb(214, 214, 214);" text="See moves">
+         <font>
+            <Font name="Bookman Old Style Bold" size="14.0" />
+         </font>
+      </Button>
+      <ListView fx:id="gameList" layoutX="191.0" layoutY="129.0" onMouseClicked="#getGameDetails" prefHeight="370.0" prefWidth="255.0" style="-fx-font-weight: bold;" />
+      <TextFlow fx:id="gameDetails" layoutX="483.0" layoutY="129.0" prefHeight="370.0" prefWidth="390.0" style="-fx-background-color: white;" />
+      <Label alignment="BOTTOM_CENTER" layoutX="199.0" layoutY="86.0" prefHeight="42.0" prefWidth="238.0" text="Match History" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label alignment="BOTTOM_CENTER" layoutX="563.0" layoutY="86.0" prefHeight="42.0" prefWidth="238.0" text="Match Details" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

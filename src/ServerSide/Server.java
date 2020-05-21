@@ -361,6 +361,7 @@ public class Server extends Observable implements Runnable
                                 {
                                     GameCreatedMsg gameCreatedMsg = new GameCreatedMsg(newGame, client.clientsUserName);
                                     client.objectOutputToClient.writeObject(gameCreatedMsg);
+                                    sendToServerGUI(gameCreatedMsg);
                                 }
                             }
                             else if(newGameMsg.getPlayer2Id().equals("1")) // new PvC game
@@ -450,6 +451,8 @@ public class Server extends Observable implements Runnable
                                 //start the game
                                 GameStartingMsg gameStartingMsg = new GameStartingMsg(joinGameMsg.getGameInfo(), gameCreator, joinGameMsg.getRequestingUser());
 
+                                sendToServerGUI(joinGameMsg);
+
                                 //send to game creator
                                 clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.writeObject(gameStartingMsg);
                                 clientMapPlayerId.get(gameCreator.getUserID()).objectOutputToClient.flush();
@@ -530,6 +533,8 @@ public class Server extends Observable implements Runnable
                         game.setStatus("ENDED");
                         DatabaseManager.getInstance().update(game);
 
+                        sendToServerGUI(gameWonMsg);
+
                         //send win msg to other player
                         if(!game.getP2Id().equals("1")) // not a PvC game
                         {
@@ -554,6 +559,8 @@ public class Server extends Observable implements Runnable
                         game.setEndTime();
                         game.setStatus("ENDED");
                         DatabaseManager.getInstance().update(game);
+
+                        sendToServerGUI(gameTiedMsg);
 
                         //send tie msg to other player
                         if(!game.getP2Id().equals("1")) // not a PvC game
@@ -601,6 +608,8 @@ public class Server extends Observable implements Runnable
                             game.setStatus("ENDED");
                             DatabaseManager.getInstance().update(game);
                         }
+
+                        sendToServerGUI(userLeftGameMsg);
                     }
                     else if(nextMsg instanceof ViewGameRequestMsg)
                     {

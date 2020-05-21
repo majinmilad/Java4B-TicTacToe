@@ -19,7 +19,7 @@ public class DatabaseManager implements DataSource {
     private DatabaseManager() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chabo\\Documents\\GitHub\\Java 4B Repos\\Tic-Tac-Toe repos\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\Phillip\\Documents\\GitHub\\Java4B-TicTacToe\\Database\\TicTacToeDB.db");
             // Milad: C:\Users\chabo\Documents\GitHub\Java 4B Repos\Tic-Tac-Toe repos\Java4B-TicTacToe\Database\TicTacToeDB.db
             // Phill: Database/TicTacToeDB.db
             // Kenny:
@@ -84,7 +84,7 @@ public class DatabaseManager implements DataSource {
             UUID uniqueId = UUID.randomUUID();
 
             qryBuilder.append("Moves (gameId,playerId,X_coord,Y_coord,time,UUID) " +
-                    "VALUES (\'" + m.getGameId() +  "\', \'" + m.getId() + "\', " + m.getXcoord()
+                    "VALUES (\'" + m.getGameId() +  "\', \'" + m.getPlayerId() + "\', " + m.getXcoord()
                     + ", " + m.getYcoord() + ", \'" + m.getTime() + "\', \'" + uniqueId + "\')");
         }
         else if(obj instanceof GameViewers)
