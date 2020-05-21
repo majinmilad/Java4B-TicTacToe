@@ -48,7 +48,7 @@ public class lobbyPvPController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
         //populate lobby gameList with waiting games
-        RequestForGamesMsg requestGamesMsg = new RequestForGamesMsg("WAITING");
+        RequestForGamesMsg requestGamesMsg = new RequestForGamesMsg("\'WAITING\' AND p2Id != 1");
 
         try {
             Global.toServer.writeObject(requestGamesMsg);
@@ -153,7 +153,7 @@ public class lobbyPvPController implements Initializable {
     void refreshButtonClicked(ActionEvent event)
     {
         //request for gameList with waiting games
-        RequestForGamesMsg requestGamesMsg = new RequestForGamesMsg("WAITING");
+        RequestForGamesMsg requestGamesMsg = new RequestForGamesMsg("\'WAITING\' AND p2Id != 1");
 
         try {
             Global.toServer.writeObject(requestGamesMsg);
