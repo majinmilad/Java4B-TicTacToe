@@ -361,6 +361,7 @@ public class Server extends Observable implements Runnable
                                 {
                                     GameCreatedMsg gameCreatedMsg = new GameCreatedMsg(newGame, client.clientsUserName);
                                     client.objectOutputToClient.writeObject(gameCreatedMsg);
+                                    sendToServerGUI(gameCreatedMsg);
                                 }
                             }
                             else if(newGameMsg.getPlayer2Id().equals("1")) // new PvC game
@@ -471,6 +472,8 @@ public class Server extends Observable implements Runnable
                                 DatabaseManager.getInstance().update(game);
                             }
                         }
+
+                        sendToServerGUI(joinGameMsg);
                     }
                     else if(nextMsg instanceof KillListenerMsg)
                     {
@@ -515,6 +518,8 @@ public class Server extends Observable implements Runnable
                         game.setStatus("ENDED");
                         DatabaseManager.getInstance().update(game);
 
+                        sendToServerGUI(gameWonMsg);
+
                         //send win msg to other player
                         if(!game.getP2Id().equals("1")) // not a PvC game
                         {
@@ -539,6 +544,8 @@ public class Server extends Observable implements Runnable
                         game.setEndTime();
                         game.setStatus("ENDED");
                         DatabaseManager.getInstance().update(game);
+
+                        sendToServerGUI(gameTiedMsg);
 
                         //send tie msg to other player
                         if(!game.getP2Id().equals("1")) // not a PvC game
@@ -586,6 +593,8 @@ public class Server extends Observable implements Runnable
                             game.setStatus("ENDED");
                             DatabaseManager.getInstance().update(game);
                         }
+
+                        sendToServerGUI(userLeftGameMsg);
                     }
 
 

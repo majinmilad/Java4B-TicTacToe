@@ -235,6 +235,36 @@ public class serverMainWindowController implements Observer, Initializable {
                     messageBox.appendText("user \"" + ((UpdateUserMsg) arg).getUser().getUsername() + "\" has updated their account\n\n");
                     refreshButtonClicked(new ActionEvent());
                 }
+                else if(arg instanceof GameCreatedMsg)
+                {
+                    gameMessageBox.appendText("user \"" + ((GameCreatedMsg) arg).getCreatorUsername() + "\" has created a game\n\n");
+                    updateGamesButtonClicked();
+                }
+                else if(arg instanceof GameWonMsg)
+                {
+                    gameMessageBox.appendText("User ID: " + ((GameWonMsg) arg).getGameWinner() + " won a game!\n\n");
+                    updateGamesButtonClicked();
+                }
+                else if (arg instanceof GameTiedMsg)
+                {
+                    gameMessageBox.appendText("Game " +((GameTiedMsg )arg).getGameId() + "ended in a tie.\n\n");
+                    updateGamesButtonClicked();
+                }
+                else if(arg instanceof  UserLeftGameMsg)
+                {
+                    gameMessageBox.appendText("User " + ((UserLeftGameMsg)arg).getUser().getUsername() + "left a game\n\n");
+                    updateGamesButtonClicked();
+                }
+                else if(arg instanceof  UserLeftLobbyMsg)
+                {
+                    gameMessageBox.appendText("User " + ((UserLeftLobbyMsg)arg).getUser().getUsername() + "left the lobby\n\n");
+                    updateGamesButtonClicked();
+                }
+                else if(arg instanceof JoinGameRequestMsg)
+                {
+                    gameMessageBox.appendText("User " + ((JoinGameRequestMsg)arg).getRequestingUser().getUsername() + "is joining a game\n\n");
+                    updateGamesButtonClicked();
+                }
             }
         });
     }

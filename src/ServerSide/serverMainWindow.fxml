@@ -37,7 +37,7 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <Button fx:id="gameInformationButton" layoutX="272.0" layoutY="736.0" mnemonicParsing="false" onAction="#gameInfoButtonClicked" prefHeight="50.0" prefWidth="164.0" text="Game Information" />
+            <Button fx:id="gameInformationButton" layoutX="272.0" layoutY="736.0" mnemonicParsing="false" onAction="#gameInfoButtonClicked" prefHeight="50.0" prefWidth="340.0" text="Game Information" />
             <Label alignment="CENTER" layoutX="330.0" layoutY="25.0" prefHeight="50.0" prefWidth="225.0" text="Games" textFill="WHITE">
                <font>
                   <Font size="24.0" />
@@ -50,7 +50,6 @@
                   <TableColumn fx:id="statusCol" editable="false" maxWidth="1.7976931348623157E308" prefWidth="111.0" text="Status" />
               </columns>
             </TableView>
-            <Button fx:id="updateGamesButton" layoutX="448.0" layoutY="736.0" mnemonicParsing="false" onAction="#updateGamesButtonClicked" prefHeight="50.0" prefWidth="164.0" text="Update List" />
          </children>
       </Pane>
    </children>
