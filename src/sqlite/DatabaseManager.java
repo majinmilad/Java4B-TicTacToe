@@ -131,6 +131,14 @@ public class DatabaseManager implements DataSource {
                     "SET startTime = \'"+ g.getStartTime() + "\',  p2Id = \'" + g.getP2Id() +"\', winnerId = \'" + g.getWinnerId() + "\', " +
                     "endTime = \'" + g.getEndTime() +"\', gameStatus = \'" + g.getStatus() + "\' " + "WHERE UUID = \'" + g.getGameId() + "\'");
         }
+        else if(obj instanceof GameViewers)
+        {
+            GameViewers gv = (GameViewers) obj;
+
+            qryBuilder.append("GameViewers" +
+                              "SET viewingStatus = \'" + gv.getStatus() + "\' " +
+                              "WHERE gameId == \'" + gv.getId() + "\'");
+        }
 
 
         try {
@@ -233,7 +241,7 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof Game)
         {
 //            Game g = (Game) obj;
-//            qryBuilder.append("FROM Game " + "WHERE UUID = \'" + g.getGameId() + "\'" );
+//            qryBuilder.append("FROM Game " + "WHERE id = \'" + g.getId() + "\'" );
 //
 //            try {
 //                ResultSet rs = executeQuery(qryBuilder.toString());
@@ -286,21 +294,66 @@ public class DatabaseManager implements DataSource {
         {
             qryBuilder.append("* FROM Game " + filter + " LIMIT 1");
 
+            /*
+                    @ To get game history
+                    "WHERE p1Id = \'" +  playerID  + "\' "
+                   + OR p2Id = \'" +  playerID + "\' "
+
+                    @ To Get Active Games
+                    "WHERE endTime != NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To Get Completed Games
+                    "WHERE endTime = NULL "
+                  + "ORDER BY id ASC "
+
+                    @ To See if Player is playing
+                     "WHERE p1Id = \'" +  playerID  + "\' "
+                   + "OR p2Id = \'" +  playerID + "\' "
+                   + "AND endTime != NULL "
+             */
+
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
 
                 Game game = new Game(rs.getString("p1Id"), rs.getString("p2Id"),
                         rs.getString("startTime"), rs.getString("endTime"),
                         rs.getString("creatorId"), rs.getString("winnerId"),
-                        rs.getString("UUID"));
+                        rs.getString("gameStatus"), rs.getString("UUID"));
+
 
                 System.out.println("Successful Game query\n");
                 return game;
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
                 System.out.println("Unsuccessful Game query");
                 e.printStackTrace();
                 return null;
             }
+
+        }
+        else if(obj instanceof GameViewers)
+        {
+            GameViewers gv = (GameViewers) obj;
+            qryBuilder.append("* From GameViewers " + filter + " LIMIT 1");
+
+            try {
+                ResultSet rs = executeQuery(qryBuilder.toString());
+                rs.next();
+
+                GameViewers gameviewer = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"),
+                        rs.getString("viewingStatus"));
+
+                System.out.println("Successful GameViewer query");
+
+                return gameviewer;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Unsuccessful User query");
+                return null;
+            }
+
         }
 
         return null; //temp
@@ -313,11 +366,11 @@ public class DatabaseManager implements DataSource {
         List <BaseModel> list = new ArrayList<>();
 
         StringBuilder qryBuilder = new StringBuilder();
-        qryBuilder.append("SELECT * ");
+        qryBuilder.append("SELECT ");
 
         if(obj instanceof User)
         {
-            qryBuilder.append("FROM User WHERE userID > 1 " +  filter);
+            qryBuilder.append("* FROM User WHERE userID > 1 " +  filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
@@ -339,7 +392,7 @@ public class DatabaseManager implements DataSource {
         }
         else if (obj instanceof Game)
         {
-            qryBuilder.append("FROM Game WHERE p2Id != 1 " + filter);
+            qryBuilder.append("* FROM Game " + filter);
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
@@ -349,7 +402,7 @@ public class DatabaseManager implements DataSource {
                     Game g = new Game(rs.getString("p1Id"), rs.getString("p2Id"),
                             rs.getString("startTime"), rs.getString("endTime"),
                             rs.getString("creatorId"), rs.getString("winnerId"),
-                            rs.getString("UUID"));
+                            rs.getString("gameStatus"), rs.getString("UUID"));
 
                     list.add(g);
                 }
@@ -363,9 +416,7 @@ public class DatabaseManager implements DataSource {
         else if (obj instanceof Move)
         {
             Move moves = (Move) obj;
-            qryBuilder.append("FROM Moves "
-                    +  "WHERE gameId = \'" + moves.getGameId() + "\' "
-                    +  "ORDER BY time ASC;");
+            qryBuilder.append("* FROM Moves " + filter );
 
             try {
                 ResultSet   rs = executeQuery(qryBuilder.toString());
@@ -386,15 +437,15 @@ public class DatabaseManager implements DataSource {
         {
             GameViewers gv = (GameViewers) obj;
 
-            qryBuilder.append("FROM GameViewers " +
-                    "WHERE viewerId = \'" + gv.getId() + "\' " );
+            qryBuilder.append("DISTINCT * FROM GameViewers " +
+                    "WHERE gameId = \'" + gv.getId() + "\' " );
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
-                    GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"));
+                    GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"), rs.getString("gameStatus"));
                     list.add(gameViewers);
                 }
 

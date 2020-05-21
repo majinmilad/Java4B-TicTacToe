@@ -6,26 +6,26 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.mainMenuWindowController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.mainMenuWindowController">
    <children>
-      <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: linear-gradient(to top, #1D4350,  #A43931);">
+      <Pane prefHeight="490.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to top, #1D4350,  #A43931);">
          <children>
             <Label alignment="CENTER" layoutX="44.0" layoutY="14.0" prefHeight="50.0" prefWidth="512.0" text="Menu" textFill="WHITE">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <Button id="pvpButton" fx:id="pvpButton" alignment="CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="71.0" mnemonicParsing="false" onAction="#pvpButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Player VS Player">
+            <Button id="pvpButton" fx:id="pvpButton" alignment="CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="71.0" mnemonicParsing="false" onAction="#pvpButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Player VS Player" textAlignment="CENTER">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button id="deleteAccountButton" fx:id="pvcButton" alignment="CENTER" layoutX="129.0" layoutY="132.0" mnemonicParsing="false" onAction="#pvcButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Player VS Computer">
+            <Button id="deleteAccountButton" fx:id="pvcButton" alignment="CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="132.0" mnemonicParsing="false" onAction="#pvcButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Player VS Computer">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button id="nextButtonLogin" fx:id="logoutButton" layoutX="129.0" layoutY="311.0" mnemonicParsing="false" onAction="#logoutButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Log out">
+            <Button id="nextButtonLogin" fx:id="logoutButton" layoutX="129.0" layoutY="369.0" mnemonicParsing="false" onAction="#logoutButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Log out">
                <font>
                   <Font size="24.0" />
                </font>
@@ -35,7 +35,12 @@
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button id="nextButtonLogin" fx:id="accountSettingsButton" layoutX="129.0" layoutY="252.0" mnemonicParsing="false" onAction="#accountSettingsButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Account Settings">
+            <Button id="nextButtonLogin" fx:id="accountSettingsButton" layoutX="129.0" layoutY="310.0" mnemonicParsing="false" onAction="#accountSettingsButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Account Settings">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
+            <Button id="nextButtonLogin" fx:id="gameHistoryButton" layoutX="129.0" layoutY="250.0" mnemonicParsing="false" onAction="#gameHistoryButtonClicked" prefHeight="45.0" prefWidth="343.0" style="-fx-background-color: rgb(214, 214, 214);" text="Game History">
                <font>
                   <Font size="24.0" />
                </font>

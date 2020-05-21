@@ -194,4 +194,15 @@ public class mainMenuWindowController {
         window.show();
     }
 
+    @FXML
+    void gameHistoryButtonClicked(ActionEvent event) throws IOException
+    {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("gameHistoryWindow.fxml"));
+        Parent gHistoryParent = loader.load();
+        Scene gHistoryScene = new Scene(gHistoryParent);
+        Stage gHistoryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        gHistoryStage.setScene(gHistoryScene);
+        gHistoryStage.show();
+    }
+
 }

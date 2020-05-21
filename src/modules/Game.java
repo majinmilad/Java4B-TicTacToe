@@ -5,8 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class Game extends BaseModel
-{
+public class Game extends BaseModel {
     private String p1Id;
     private String p2Id;
     private String startTime;
@@ -17,8 +16,7 @@ public class Game extends BaseModel
     private final String gameId;
 
     //create a brand new game
-    public Game(User player1, String player2Id)
-    {
+    public Game(User player1, String player2Id) {
         p1Id = player1.getUserID();
         p2Id = player2Id;
         creatorId = player1.getUserID();
@@ -26,20 +24,19 @@ public class Game extends BaseModel
     }
 
     //create a game and set all attributes
-    public Game(String p1Id, String p2Id, String sTime, String eTime, String gameCreatorId, String winnerId, String gameId)
-    {
+    public Game(String p1Id, String p2Id, String sTime, String eTime, String gameCreatorId, String winnerId,String status, String gameId) {
         this.p1Id = p1Id;
         this.p2Id = p2Id;
         startTime = sTime;
         endTime = eTime;
         creatorId = gameCreatorId;
         this.winnerId = winnerId;
+        this.status = status;
         this.gameId = gameId;
     }
 
     //constructor for dummy instances
-    public Game()
-    {
+    public Game() {
         gameId = null;
     }
 
@@ -72,6 +69,10 @@ public class Game extends BaseModel
         return gameId;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     // setters
     public void setP1Id(String p1Id) {
         this.p1Id = p1Id;
@@ -81,26 +82,30 @@ public class Game extends BaseModel
         this.p2Id = p2Id;
     }
 
-    public void setStartTime() { startTime = generateTime(); }
+    public void setStartTime() {
+        startTime = generateTime();
+    }
 
-    public void setEndTime() { endTime = generateTime(); }
+    public void setEndTime() {
+        endTime = generateTime();
+    }
 
     public void setWinnerId(String winnerId) {
         this.winnerId = winnerId;
     }
 
-    public void setStatus(String status){this.status = status;}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     // helper methods
-    public String generateTime()
-    {
+    public String generateTime() {
         Date time = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.format(time);
     }
 
-    public void displayAll()
-    {
+    public void displayAll() {
         System.out.println(p1Id);
         System.out.println(p2Id);
         System.out.println(startTime);
@@ -109,8 +114,5 @@ public class Game extends BaseModel
         System.out.println(winnerId);
         System.out.println(gameId);
     }
-
-    public String getStatus() {
-        return status;
-    }
 }
+

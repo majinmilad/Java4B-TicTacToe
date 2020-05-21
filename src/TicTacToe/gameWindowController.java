@@ -167,7 +167,13 @@ public class gameWindowController implements Initializable
         {
             turnPrompt.setText(p2TurnPrompt);
 
-            executeComputerMove();
+            MoveCoord computerMove = executeComputerMove();
+
+            //send move to server
+            Move move = new Move(thisGameID, "1", computerMove.row, computerMove.col);
+            MoveMadeMsg moveMadeMsg = new MoveMadeMsg(move, new User("Computer"));
+            Global.toServer.writeObject(moveMadeMsg);
+            Global.toServer.flush();
 
             itsYourTurn = true;
             turnPrompt.setText(p1TurnPrompt);
@@ -681,7 +687,7 @@ public class gameWindowController implements Initializable
         return false;
     }
 
-    private void executeComputerMove()
+    private MoveCoord executeComputerMove()
     {
         //translate into 2d board
         int[][] currentBoard = new int[3][3];
@@ -745,10 +751,14 @@ public class gameWindowController implements Initializable
                 b9.setTextFill(Color.DARKKHAKI);
                 b9.setText("X");
             }
+
+            return computerMove;
         }
         catch(Exception e) {
             System.out.println(e.getMessage());
         }
+
+        return null;
     }
 
 }

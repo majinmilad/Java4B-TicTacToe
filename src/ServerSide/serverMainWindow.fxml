@@ -37,17 +37,17 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <Button fx:id="gameInformationButton" layoutX="272.0" layoutY="736.0" mnemonicParsing="false" onAction="#refreshButtonClicked" prefHeight="50.0" prefWidth="340.0" text="Game Information" />
+            <Button fx:id="gameInformationButton" layoutX="272.0" layoutY="736.0" mnemonicParsing="false" onAction="#gameInfoButtonClicked" prefHeight="50.0" prefWidth="340.0" text="Game Information" />
             <Label alignment="CENTER" layoutX="330.0" layoutY="25.0" prefHeight="50.0" prefWidth="225.0" text="Games" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>
             </Label>
-            <TableView fx:id="gamesLIst" layoutX="272.0" layoutY="78.0" prefHeight="645.0" prefWidth="340.0">
+            <TableView fx:id="gameList" layoutX="272.0" layoutY="78.0" onMouseClicked="#selectGame" prefHeight="645.0" prefWidth="340.0">
               <columns>
-                <TableColumn prefWidth="123.0" text="Game ID" />
-                <TableColumn prefWidth="105.0" text="Information" />
-                  <TableColumn prefWidth="111.0" text="Status" />
+                <TableColumn fx:id="idCol" prefWidth="123.0" text="Game ID" />
+                <TableColumn fx:id="infoCol" prefWidth="105.0" text="Information" />
+                  <TableColumn fx:id="statusCol" editable="false" prefWidth="111.0" text="Status" />
               </columns>
             </TableView>
          </children>

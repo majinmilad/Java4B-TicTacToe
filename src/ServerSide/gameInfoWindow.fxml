@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.TextFlow?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ServerSide.gameInfoController">
+   <children>
+      <TabPane fx:id="tabP" layoutX="80.0" layoutY="50.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: -fx-control-inner-background;" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab closable="false" text="Game Details">
+               <content>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #2c2f33;">
+                     <children>
+                        <TextFlow fx:id="gameDetailBox" layoutX="19.0" layoutY="15.0" prefHeight="338.0" prefWidth="562.0" style="-fx-background-color: white;" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+          <Tab fx:id="movesTab" closable="false" text="Moves">
+               <content>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #2c2f33;">
+                     <children>
+                        <TextFlow fx:id="movesBox" layoutX="19.0" layoutY="15.0" prefHeight="338.0" prefWidth="562.0" style="-fx-background-color: white; -fx-font-weight: bold;" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>
