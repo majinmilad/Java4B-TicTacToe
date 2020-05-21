@@ -390,11 +390,11 @@ public class Server extends Observable implements Runnable
 
                         if(requestGamesMsg.getGameStatusFilter() == null)
                         {
-                            gameList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 ");
+                            gameList = DatabaseManager.getInstance().queryList(new Game(), "");
                         }
                         else
                         {
-                            gameList = DatabaseManager.getInstance().queryList(new Game(), "WHERE p2Id != 1 AND gameStatus = \'" + requestGamesMsg.getGameStatusFilter() + "\'");
+                            gameList = DatabaseManager.getInstance().queryList(new Game(), "WHERE gameStatus = " + requestGamesMsg.getGameStatusFilter());
                         }
 
                         //convert list of games into list of gameInfo objects
@@ -501,7 +501,22 @@ public class Server extends Observable implements Runnable
                                 }
                             }
 
-                            //send to viewers
+//                            //send to viewers
+//                            List<BaseModel> viewerList;
+//
+//                            viewerList = DatabaseManager.getInstance().queryList(new GameViewers(game.getGameId()), " AND viewingStatus = \'WATCHING\'");
+//
+//                            if(viewerList != null)
+//                            {
+//                                System.out.println(viewerList.size());
+//                            }
+//                            for(BaseModel g : viewerList)
+//                            {
+//                                GameViewers gameViewer = (GameViewers) g;
+//
+//                                clientMapPlayerId.get(gameViewer.getPlayerId()).objectOutputToClient.writeObject(moveMsg);
+//                                clientMapPlayerId.get(gameViewer.getPlayerId()).objectOutputToClient.flush();
+//                            }
                         }
                     }
                     else if(nextMsg instanceof GameWonMsg)
@@ -587,32 +602,31 @@ public class Server extends Observable implements Runnable
                             DatabaseManager.getInstance().update(game);
                         }
                     }
+                    else if(nextMsg instanceof ViewGameRequestMsg)
+                    {
 
+                        ViewGameRequestMsg viewGameMsg = (ViewGameRequestMsg) nextMsg;
 
+                        //check if game still in RUNNING mode
+                        Game game = (Game) DatabaseManager.getInstance().query(new Game(),
+                                "WHERE UUID = \'" + viewGameMsg.getGameInfo().getGame().getGameId()
+                                        + "\' AND gameStatus = \'RUNNING\'");
 
-//                    else if(nextMsg instanceof ViewGameMsg)
-//                    {
-//
-//                        ViewGameMsg viewGameMsg = (ViewGameMsg) nextMsg;
-//                        Object liveGame = DatabaseManager.getInstance().query(new Game(), "WHERE gameId = \'" + viewGameMsg.getNewViewer().getId()
-//                                + "\' "
-//                                + "AND status != 'ENDED'" );
-//
-//                        // Game is still running
-//                        if(liveGame != null)
-//                        {
-//                            // Gets the Game Viewer Class w/ gameId + viewerId
-//                            GameViewers newViewer = viewGameMsg.getNewViewer();
-//                            // Adds Game Viewer Id into DB
-//                            DatabaseManager.getInstance().insert(newViewer);
-//
-//                            // Add Viewer to Game & A Subscribed list?
-//                        }
-//                        else
-//                        {
-//                            // Notify that game has ended
-//                        }
-//                    }
+//                        //check if already a viewer of game
+//                        Object alreadyViewer = DatabaseManager.getInstance().query(new GameViewers()) TRYING TO NOT LET VIEWER BE LISTED TWICE
+
+                        if(game != null)
+                        {
+                            //add user as a viewer
+                            GameViewers viewer = new GameViewers(game.getGameId(), viewGameMsg.getRequestingUser().getUserID(), "WATCHING");
+                            DatabaseManager.getInstance().insert(viewer);
+
+                            //send begin viewing message
+                            BeginViewingGameMsg beginViewingMsg = new BeginViewingGameMsg(true, viewGameMsg.getGameInfo());
+                            client.objectOutputToClient.writeObject(beginViewingMsg);
+                            client.objectOutputToClient.flush();
+                        }
+                    }
                 }
                 catch (InterruptedException | IOException e) {
                     System.out.println("exception caught in server Publisher's run()");

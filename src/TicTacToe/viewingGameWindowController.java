@@ -1,9 +1,6 @@
 package TicTacToe;
 
 import Messages.*;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import modules.Move;
 import app.Global;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -15,7 +12,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -23,16 +22,16 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
+import modules.Move;
 import modules.User;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class gameWindowController implements Initializable
+public class viewingGameWindowController implements Initializable
 {
     private boolean isFirstPlayer = true;
 
@@ -106,6 +105,8 @@ public class gameWindowController implements Initializable
         resetButton.setVisible(false);
 
         setBoard();
+
+        itsYourTurn = false;
 
         listener = new ListeningClass();
         listener.start();
@@ -291,7 +292,6 @@ public class gameWindowController implements Initializable
                                 public void run() {
                                     paintButton(button, opponentSymbol);
 
-                                    itsYourTurn = !itsYourTurn;
                                     turnPrompt.setText(yourTurnPrompt);
                                     turnNumber++;
                                 }
@@ -340,30 +340,31 @@ public class gameWindowController implements Initializable
                         }
                         else if(serverMsg instanceof OpponentLeftGameMsg)
                         {
-                            System.out.println("got it!");
+                            OpponentLeftGameMsg leftMsg = (OpponentLeftGameMsg) serverMsg;
 
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if(yourUsername.equals(player1Name.getText()))
+                                    if(leftMsg.getUserWhoLeft().getUsername().equals(player2Name.getText()))
                                     {
                                         player1Score++;
                                         scoreP1.setText(Integer.toString(player1Score));
+                                        turnPrompt.setText(player1Name.getText() + " WON!");
                                     }
                                     else
                                     {
                                         player2Score++;
                                         scoreP2.setText(Integer.toString(player2Score));
+                                        turnPrompt.setText(player2Name.getText() + " WON!");
                                     }
 
-                                    turnPrompt.setText(yourUsername + " WON!");
                                     gameBoard.setDisable(true);
                                     backButton.setVisible(true);
 
                                     //display a message
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Your opponent has left the game. You WIN!");
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "The opponent has left the game.");
                                     alert.setTitle("Opponent Left");
-                                    alert.setHeaderText("WINNER");
+                                    alert.setHeaderText("Oops");
                                     Optional<ButtonType> buttonResult = alert.showAndWait();
                                 }
                             });

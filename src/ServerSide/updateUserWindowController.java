@@ -14,6 +14,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import modules.Game;
+import modules.GameViewers;
 import modules.User;
 import sqlite.DatabaseManager;
 
@@ -97,9 +99,9 @@ public class updateUserWindowController implements Initializable {
     void kickButtonClicked()
     {
         Server.getInstance().processMessage(new LogoutMsg(user));
-        Object s = DatabaseManager.getInstance().get(user);
+        Game s = (Game) DatabaseManager.getInstance().get(user);
 
-        if(s == null)
+        if(s.getStatus().equalsIgnoreCase("OFFLINE"))
         {
             errorLabel.setTextFill(Color.LIMEGREEN);
             errorLabel.setText("User has been kicked");

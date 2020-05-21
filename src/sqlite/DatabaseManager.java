@@ -91,8 +91,8 @@ public class DatabaseManager implements DataSource {
         {
             GameViewers gv = (GameViewers) obj;
 
-            qryBuilder.append("GameViewers (gameId,viewerId) " +
-                    "VALUES (" + gv.getId() + ", " + gv.getPlayerId() + ')');
+            qryBuilder.append("GameViewers (gameId,viewerId, viewingStatus) " +
+                    "VALUES (\'" + gv.getGameId() + "\', \'" + gv.getPlayerId() + "\', \'" + gv.getStatus() + "\')");
         }
 
         try {
@@ -438,14 +438,14 @@ public class DatabaseManager implements DataSource {
             GameViewers gv = (GameViewers) obj;
 
             qryBuilder.append("DISTINCT * FROM GameViewers " +
-                    "WHERE gameId = \'" + gv.getId() + "\' " );
+                    "WHERE gameId = \'" + gv.getId() + "\' " + filter );
 
             try {
                 ResultSet rs = executeQuery(qryBuilder.toString());
 
                 while(rs.next())
                 {
-                    GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"), rs.getString("gameStatus"));
+                    GameViewers gameViewers = new GameViewers(rs.getString("gameId"), rs.getString("viewerId"), rs.getString("viewingStatus"));
                     list.add(gameViewers);
                 }
 
